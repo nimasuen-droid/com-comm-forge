@@ -13,6 +13,7 @@ import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
 import { Route as ProjectsProjectIdIndexRouteImport } from './routes/projects.$projectId.index'
+import { Route as ProjectsProjectIdWorkflowRouteImport } from './routes/projects.$projectId.workflow'
 import { Route as ProjectsProjectIdTurnoverRouteImport } from './routes/projects.$projectId.turnover'
 import { Route as ProjectsProjectIdSystemsRouteImport } from './routes/projects.$projectId.systems'
 import { Route as ProjectsProjectIdPunchRouteImport } from './routes/projects.$projectId.punch'
@@ -41,6 +42,12 @@ const ProjectsProjectIdIndexRoute = ProjectsProjectIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProjectsProjectIdRoute,
 } as any)
+const ProjectsProjectIdWorkflowRoute =
+  ProjectsProjectIdWorkflowRouteImport.update({
+    id: '/workflow',
+    path: '/workflow',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
 const ProjectsProjectIdTurnoverRoute =
   ProjectsProjectIdTurnoverRouteImport.update({
     id: '/turnover',
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
   '/projects/$projectId/turnover': typeof ProjectsProjectIdTurnoverRoute
+  '/projects/$projectId/workflow': typeof ProjectsProjectIdWorkflowRoute
   '/projects/$projectId/': typeof ProjectsProjectIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -105,6 +113,7 @@ export interface FileRoutesByTo {
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
   '/projects/$projectId/turnover': typeof ProjectsProjectIdTurnoverRoute
+  '/projects/$projectId/workflow': typeof ProjectsProjectIdWorkflowRoute
   '/projects/$projectId': typeof ProjectsProjectIdIndexRoute
 }
 export interface FileRoutesById {
@@ -119,6 +128,7 @@ export interface FileRoutesById {
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
   '/projects/$projectId/turnover': typeof ProjectsProjectIdTurnoverRoute
+  '/projects/$projectId/workflow': typeof ProjectsProjectIdWorkflowRoute
   '/projects/$projectId/': typeof ProjectsProjectIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
     | '/projects/$projectId/turnover'
+    | '/projects/$projectId/workflow'
     | '/projects/$projectId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -146,6 +157,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
     | '/projects/$projectId/turnover'
+    | '/projects/$projectId/workflow'
     | '/projects/$projectId'
   id:
     | '__root__'
@@ -159,6 +171,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
     | '/projects/$projectId/turnover'
+    | '/projects/$projectId/workflow'
     | '/projects/$projectId/'
   fileRoutesById: FileRoutesById
 }
@@ -195,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/projects/$projectId/'
       preLoaderRoute: typeof ProjectsProjectIdIndexRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
+    '/projects/$projectId/workflow': {
+      id: '/projects/$projectId/workflow'
+      path: '/workflow'
+      fullPath: '/projects/$projectId/workflow'
+      preLoaderRoute: typeof ProjectsProjectIdWorkflowRouteImport
       parentRoute: typeof ProjectsProjectIdRoute
     }
     '/projects/$projectId/turnover': {
@@ -257,6 +277,7 @@ interface ProjectsProjectIdRouteChildren {
   ProjectsProjectIdPunchRoute: typeof ProjectsProjectIdPunchRoute
   ProjectsProjectIdSystemsRoute: typeof ProjectsProjectIdSystemsRoute
   ProjectsProjectIdTurnoverRoute: typeof ProjectsProjectIdTurnoverRoute
+  ProjectsProjectIdWorkflowRoute: typeof ProjectsProjectIdWorkflowRoute
   ProjectsProjectIdIndexRoute: typeof ProjectsProjectIdIndexRoute
 }
 
@@ -268,6 +289,7 @@ const ProjectsProjectIdRouteChildren: ProjectsProjectIdRouteChildren = {
   ProjectsProjectIdPunchRoute: ProjectsProjectIdPunchRoute,
   ProjectsProjectIdSystemsRoute: ProjectsProjectIdSystemsRoute,
   ProjectsProjectIdTurnoverRoute: ProjectsProjectIdTurnoverRoute,
+  ProjectsProjectIdWorkflowRoute: ProjectsProjectIdWorkflowRoute,
   ProjectsProjectIdIndexRoute: ProjectsProjectIdIndexRoute,
 }
 
