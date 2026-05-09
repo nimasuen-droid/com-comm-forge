@@ -103,7 +103,7 @@ function PunchPage() {
         })}
       </div>
 
-      {showNew && <NewPunchDialog systems={project.systems} onClose={() => setShowNew(false)} onAdd={(d) => { add(project.id, d); setShowNew(false); }} />}
+      {showNew && <NewPunchDialog systems={project.systems} onClose={() => setShowNew(false)} onAdd={(d: any) => { add(project.id, d); setShowNew(false); }} />}
 
       <EngineeringInsight
         title="Punch Categories & Closeout Strategy"
