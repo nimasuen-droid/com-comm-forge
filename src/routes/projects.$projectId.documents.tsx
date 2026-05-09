@@ -1,9 +1,10 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import { useProject, useStore } from "@/lib/store";
+import { exportMcDossier, exportHandoverDossier, exportPunchRegister, exportPreservation, exportSystemRegister } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { WorkflowNav } from "@/components/WorkflowNav";
-import { FileText, Plus, Trash2 } from "lucide-react";
+import { FileText, Plus, Trash2, Download, ShieldCheck, PackageCheck, ListChecks, Wrench, Network } from "lucide-react";
 
 export const Route = createFileRoute("/projects/$projectId/documents")({
   component: DocsPage,
@@ -18,9 +19,33 @@ function DocsPage() {
   const del = useStore(s => s.deleteDocument);
   const [name, setName] = useState(""); const [type, setType] = useState(docTypes[0]); const [sysId, setSysId] = useState("");
 
+  const reports = [
+    { label: "System Register", icon: Network, run: () => exportSystemRegister(project) },
+    { label: "Punch Register", icon: ListChecks, run: () => exportPunchRegister(project) },
+    { label: "MC Dossier", icon: ShieldCheck, run: () => exportMcDossier(project) },
+    { label: "Handover Dossier", icon: PackageCheck, run: () => exportHandoverDossier(project) },
+    { label: "Preservation Log", icon: Wrench, run: () => exportPreservation(project) },
+  ];
+
   return (
     <div className="space-y-5">
-      <h2 className="text-xl font-bold flex items-center gap-2"><FileText className="h-5 w-5 text-info" /> Documentation</h2>
+      <h2 className="text-xl font-bold flex items-center gap-2"><FileText className="h-5 w-5 text-info" /> Documentation & Reports</h2>
+
+      <div className="panel p-4">
+        <div className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Generate project deliverables (Excel)</div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+          {reports.map(r => (
+            <button key={r.label} onClick={r.run} className="flex items-center gap-2 rounded-md border border-border bg-card hover:bg-muted/40 px-3 py-3 text-left">
+              <r.icon className="h-4 w-4 text-primary shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold truncate">{r.label}</div>
+                <div className="text-[10px] text-muted-foreground">.xlsx</div>
+              </div>
+              <Download className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="panel p-4 grid md:grid-cols-4 gap-2">
         <input className="bg-input border border-border rounded-md px-3 py-2 text-sm md:col-span-2" placeholder="Document name (e.g. 20-IA-001 MC Certificate)" value={name} onChange={e => setName(e.target.value)} />
