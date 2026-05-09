@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, FolderKanban, Network, ListChecks, ShieldCheck,
-  Activity, PackageCheck, Wrench, FileText, GitBranch, Cog
+  Activity, PackageCheck, Wrench, FileText, GitBranch, Cog, Info
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ export function AppSidebar() {
   const top = [
     { to: "/", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/projects", label: "Projects", icon: FolderKanban },
+    { to: "/about", label: "About this app", icon: Info },
   ];
 
   const projectNav = projectExists && activeId ? [
