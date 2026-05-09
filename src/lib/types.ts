@@ -30,6 +30,13 @@ export interface PunchItem {
   comments?: { author: string; text: string; at: string }[];
 }
 
+export const MC_CHECK_KEYS = ["walkdown","hydrotest","flushing","reinstatement","preservation","punchA"] as const;
+export const COMM_CHECK_KEYS = ["energization","loops","ce","functional","performance","reliability"] as const;
+export const TURNOVER_CHECK_KEYS = ["mc","rfsu","commComplete","opsAccept","ccc"] as const;
+export type MCCheckKey = typeof MC_CHECK_KEYS[number];
+export type CommCheckKey = typeof COMM_CHECK_KEYS[number];
+export type TurnoverCheckKey = typeof TURNOVER_CHECK_KEYS[number];
+
 export interface Subsystem {
   id: string;
   name: string;
@@ -40,6 +47,9 @@ export interface Subsystem {
   rfsuStatus: RAG;
   commStatus: RAG;
   turnoverStatus: RAG;
+  mcChecks?: Partial<Record<MCCheckKey, boolean>>;
+  commChecks?: Partial<Record<CommCheckKey, boolean>>;
+  turnoverChecks?: Partial<Record<TurnoverCheckKey, boolean>>;
   preservation?: { interval: number; lastDone?: string; notes?: string };
   notes?: string;
 }
