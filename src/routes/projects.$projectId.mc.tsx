@@ -5,6 +5,7 @@ import { mcProgress, openAPunchesFor, MC_CHECK_LABELS } from "@/lib/derive";
 import { MC_CHECK_KEYS } from "@/lib/types";
 import { exportMcDossier } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
+import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { FileCheck, ShieldCheck, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ function MCPage() {
 
   return (
     <div className="space-y-5">
+      <LearnRail module="mc" title="Learn: Mechanical Completion" />
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-success" /> Mechanical Completion</h2>
         <button onClick={() => exportMcDossier(project)} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90">

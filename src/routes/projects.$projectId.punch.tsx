@@ -2,6 +2,7 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useStore, useProject } from "@/lib/store";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
+import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { Plus, Search, Trash2, RotateCcw, Check, Download } from "lucide-react";
 import type { Discipline, PunchCategory, PunchStatus } from "@/lib/types";

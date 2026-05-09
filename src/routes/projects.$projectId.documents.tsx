@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useProject, useStore } from "@/lib/store";
 import { exportMcDossier, exportHandoverDossier, exportPunchRegister, exportPreservation, exportSystemRegister } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
+import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { FileText, Plus, Trash2, Download, ShieldCheck, PackageCheck, ListChecks, Wrench, Network } from "lucide-react";
 
@@ -29,6 +30,7 @@ function DocsPage() {
 
   return (
     <div className="space-y-5">
+      <LearnRail module="documents" title="Learn: Documentation" />
       <h2 className="text-xl font-bold flex items-center gap-2"><FileText className="h-5 w-5 text-info" /> Documentation & Reports</h2>
 
       <div className="panel p-4">

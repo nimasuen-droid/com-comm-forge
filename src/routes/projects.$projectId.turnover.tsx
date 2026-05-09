@@ -5,6 +5,7 @@ import { turnoverProgress, TURNOVER_CHECK_LABELS } from "@/lib/derive";
 import { TURNOVER_CHECK_KEYS } from "@/lib/types";
 import { exportHandoverDossier } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
+import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { PackageCheck, FileCheck2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ function TurnoverPage() {
 
   return (
     <div className="space-y-5">
+      <LearnRail module="turnover" title="Learn: Turnover & Handover" />
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold flex items-center gap-2"><PackageCheck className="h-5 w-5 text-accent" /> Turnover & Handover</h2>
         <button onClick={() => exportHandoverDossier(project)} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
