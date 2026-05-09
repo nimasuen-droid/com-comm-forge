@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, Link, useRouterState, useParams, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Link, useRouterState, useParams } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useStore, useProject } from "@/lib/store";
 import { projectKpis } from "@/lib/kpi";
@@ -15,19 +15,20 @@ export const Route = createFileRoute("/projects/$projectId")({
 });
 
 const tabs = [
-  { slug: "systems", label: "Systems", icon: Network },
-  { slug: "punch", label: "Punch", icon: ListChecks },
-  { slug: "mc", label: "MC", icon: ShieldCheck },
-  { slug: "commissioning", label: "Commissioning", icon: Activity },
-  { slug: "turnover", label: "Turnover", icon: PackageCheck },
-  { slug: "preservation", label: "Preservation", icon: Wrench },
-  { slug: "documents", label: "Documents", icon: FileText },
-  { slug: "workflow", label: "Workflow", icon: GitBranch },
+  { route: "/projects/$projectId/systems", slug: "systems", label: "Systems", icon: Network },
+  { route: "/projects/$projectId/preservation", slug: "preservation", label: "Preservation", icon: Wrench },
+  { route: "/projects/$projectId/punch", slug: "punch", label: "Punch", icon: ListChecks },
+  { route: "/projects/$projectId/mc", slug: "mc", label: "MC", icon: ShieldCheck },
+  { route: "/projects/$projectId/commissioning", slug: "commissioning", label: "Commissioning", icon: Activity },
+  { route: "/projects/$projectId/turnover", slug: "turnover", label: "Turnover", icon: PackageCheck },
+  { route: "/projects/$projectId/documents", slug: "documents", label: "Documents", icon: FileText },
+  { route: "/projects/$projectId/workflow", slug: "workflow", label: "Workflow", icon: GitBranch },
 ];
 
 function ProjectLayout() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId);
+  const fallbackProjectId = useStore(s => s.projects[0]?.id);
   const setActive = useStore(s => s.setActive);
   const pathname = useRouterState({ select: r => r.location.pathname });
 
@@ -37,7 +38,10 @@ function ProjectLayout() {
     return (
       <div className="panel p-10 text-center">
         <p className="text-muted-foreground">Project not found.</p>
-        <Link to="/projects" className="inline-block mt-4 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Back to Projects</Link>
+        <div className="mt-4 flex justify-center gap-2">
+          {fallbackProjectId && <Link to="/projects/$projectId/systems" params={{ projectId: fallbackProjectId }} className="inline-block rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground">Open available project</Link>}
+          <Link to="/projects" className="inline-block rounded-md border border-border px-4 py-2 text-sm font-semibold hover:bg-muted/50">Back to Projects</Link>
+        </div>
       </div>
     );
   }
@@ -70,10 +74,9 @@ function ProjectLayout() {
 
       <nav className="panel p-1.5 flex gap-1 overflow-x-auto">
         {tabs.map(t => {
-          const to = `/projects/${project.id}/${t.slug}`;
-          const active = pathname.startsWith(to);
+          const active = pathname.startsWith(`/projects/${project.id}/${t.slug}`);
           return (
-            <Link key={t.slug} to={to} className={cn(
+            <Link key={t.slug} to={t.route} params={{ projectId: project.id }} className={cn(
               "flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium whitespace-nowrap transition-colors",
               active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
             )}>
