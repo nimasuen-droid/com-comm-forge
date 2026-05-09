@@ -9,9 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
 import { Route as ProjectsProjectIdIndexRouteImport } from './routes/projects.$projectId.index'
 import { Route as ProjectsProjectIdWorkflowRouteImport } from './routes/projects.$projectId.workflow'
@@ -23,11 +23,6 @@ import { Route as ProjectsProjectIdMcRouteImport } from './routes/projects.$proj
 import { Route as ProjectsProjectIdDocumentsRouteImport } from './routes/projects.$projectId.documents'
 import { Route as ProjectsProjectIdCommissioningRouteImport } from './routes/projects.$projectId.commissioning'
 
-const ProjectsRoute = ProjectsRouteImport.update({
-  id: '/projects',
-  path: '/projects',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -36,6 +31,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
+  id: '/projects/',
+  path: '/projects/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
@@ -98,8 +98,8 @@ const ProjectsProjectIdCommissioningRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
+  '/projects/': typeof ProjectsIndexRoute
   '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
   '/projects/$projectId/documents': typeof ProjectsProjectIdDocumentsRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
@@ -113,7 +113,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/projects': typeof ProjectsRouteWithChildren
+  '/projects': typeof ProjectsIndexRoute
   '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
   '/projects/$projectId/documents': typeof ProjectsProjectIdDocumentsRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
@@ -128,8 +128,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
+  '/projects/': typeof ProjectsIndexRoute
   '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
   '/projects/$projectId/documents': typeof ProjectsProjectIdDocumentsRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
@@ -145,8 +145,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/projects'
     | '/projects/$projectId'
+    | '/projects/'
     | '/projects/$projectId/commissioning'
     | '/projects/$projectId/documents'
     | '/projects/$projectId/mc'
@@ -174,8 +174,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
-    | '/projects'
     | '/projects/$projectId'
+    | '/projects/'
     | '/projects/$projectId/commissioning'
     | '/projects/$projectId/documents'
     | '/projects/$projectId/mc'
@@ -190,18 +190,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  ProjectsRoute: typeof ProjectsRouteWithChildren
+  ProjectsIndexRoute: typeof ProjectsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/projects': {
-      id: '/projects'
-      path: '/projects'
-      fullPath: '/projects'
-      preLoaderRoute: typeof ProjectsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -214,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/': {
+      id: '/projects/'
+      path: '/projects'
+      fullPath: '/projects/'
+      preLoaderRoute: typeof ProjectsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects/$projectId': {
@@ -289,50 +289,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface ProjectsProjectIdRouteChildren {
-  ProjectsProjectIdCommissioningRoute: typeof ProjectsProjectIdCommissioningRoute
-  ProjectsProjectIdDocumentsRoute: typeof ProjectsProjectIdDocumentsRoute
-  ProjectsProjectIdMcRoute: typeof ProjectsProjectIdMcRoute
-  ProjectsProjectIdPreservationRoute: typeof ProjectsProjectIdPreservationRoute
-  ProjectsProjectIdPunchRoute: typeof ProjectsProjectIdPunchRoute
-  ProjectsProjectIdSystemsRoute: typeof ProjectsProjectIdSystemsRoute
-  ProjectsProjectIdTurnoverRoute: typeof ProjectsProjectIdTurnoverRoute
-  ProjectsProjectIdWorkflowRoute: typeof ProjectsProjectIdWorkflowRoute
-  ProjectsProjectIdIndexRoute: typeof ProjectsProjectIdIndexRoute
-}
-
-const ProjectsProjectIdRouteChildren: ProjectsProjectIdRouteChildren = {
-  ProjectsProjectIdCommissioningRoute: ProjectsProjectIdCommissioningRoute,
-  ProjectsProjectIdDocumentsRoute: ProjectsProjectIdDocumentsRoute,
-  ProjectsProjectIdMcRoute: ProjectsProjectIdMcRoute,
-  ProjectsProjectIdPreservationRoute: ProjectsProjectIdPreservationRoute,
-  ProjectsProjectIdPunchRoute: ProjectsProjectIdPunchRoute,
-  ProjectsProjectIdSystemsRoute: ProjectsProjectIdSystemsRoute,
-  ProjectsProjectIdTurnoverRoute: ProjectsProjectIdTurnoverRoute,
-  ProjectsProjectIdWorkflowRoute: ProjectsProjectIdWorkflowRoute,
-  ProjectsProjectIdIndexRoute: ProjectsProjectIdIndexRoute,
-}
-
-const ProjectsProjectIdRouteWithChildren =
-  ProjectsProjectIdRoute._addFileChildren(ProjectsProjectIdRouteChildren)
-
-interface ProjectsRouteChildren {
-  ProjectsProjectIdRoute: typeof ProjectsProjectIdRouteWithChildren
-}
-
-const ProjectsRouteChildren: ProjectsRouteChildren = {
-  ProjectsProjectIdRoute: ProjectsProjectIdRouteWithChildren,
-}
-
-const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
-  ProjectsRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  ProjectsRoute: ProjectsRouteWithChildren,
+  ProjectsIndexRoute: ProjectsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
