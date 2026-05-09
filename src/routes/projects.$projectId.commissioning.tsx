@@ -112,9 +112,9 @@ function CommPage() {
       />
 
       <WorkflowNav
-        prev={{ to: `/projects/${project.id}/mc`, label: "Mechanical Completion" }}
-        next={{ to: `/projects/${project.id}/turnover`, label: "Turnover & Handover" }}
-        dependency={{ to: `/projects/${project.id}/mc`, label: "MC Complete" }}
+        prev={{ to: "/projects/$projectId/mc", projectId: project.id, label: "Mechanical Completion" }}
+        next={{ to: "/projects/$projectId/turnover", projectId: project.id, label: "Turnover & Handover" }}
+        dependency={{ to: "/projects/$projectId/mc", projectId: project.id, label: "MC Complete" }}
       />
     </div>
   );

@@ -177,7 +177,7 @@ export const useStore = create<State>()(
       storage: createJSONStorage(() =>
         isBrowser
           ? localStorage
-          : ({ getItem: () => null, setItem: () => {}, removeItem: () => {} } as Storage)
+          : ({ getItem: () => null, setItem: () => {}, removeItem: () => {} } as unknown as Storage)
       ),
       skipHydration: true,
     }

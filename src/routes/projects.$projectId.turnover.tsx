@@ -72,9 +72,9 @@ function TurnoverPage() {
       />
 
       <WorkflowNav
-        prev={{ to: `/projects/${project.id}/commissioning`, label: "Commissioning" }}
-        next={{ to: `/projects/${project.id}/preservation`, label: "Preservation" }}
-        related={{ to: `/projects/${project.id}/documents`, label: "Documentation" }}
+        prev={{ to: "/projects/$projectId/commissioning", projectId: project.id, label: "Commissioning" }}
+        next={{ to: "/projects/$projectId/preservation", projectId: project.id, label: "Preservation" }}
+        related={{ to: "/projects/$projectId/documents", projectId: project.id, label: "Documentation" }}
       />
     </div>
   );

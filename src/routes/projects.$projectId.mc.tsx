@@ -88,9 +88,9 @@ function MCPage() {
       />
 
       <WorkflowNav
-        prev={{ to: `/projects/${project.id}/punch`, label: "Punch List" }}
-        next={{ to: `/projects/${project.id}/commissioning`, label: "Commissioning" }}
-        dependency={{ to: `/projects/${project.id}/systems`, label: "Systemization" }}
+        prev={{ to: "/projects/$projectId/punch", projectId: project.id, label: "Punch List" }}
+        next={{ to: "/projects/$projectId/commissioning", projectId: project.id, label: "Commissioning" }}
+        dependency={{ to: "/projects/$projectId/systems", projectId: project.id, label: "Systemization" }}
       />
     </div>
   );
