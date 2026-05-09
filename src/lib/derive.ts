@@ -34,11 +34,8 @@ export function openAPunchesFor(project: Project, sys: SystemNode, ss?: Subsyste
 
 /** MC RAG derived from checklist + open A-punches gate. */
 export function deriveMcStatus(project: Project, sys: SystemNode, ss: Subsystem): RAG {
-  const { pct } = mcProgress(ss);
-  const blocked = openAPunchesFor(project, sys, ss).length > 0;
-  if (pct === 100 && !blocked) return "green";
-  if (pct === 100 && blocked) return "amber"; // checklist done but A-punches block
-  return pctToRag(pct);
+  const openAClear = openAPunchesFor(project, sys, ss).length === 0;
+  return pctToRag(mcProgress(ss, openAClear).pct);
 }
 export function deriveCommStatus(_p: Project, _s: SystemNode, ss: Subsystem): RAG {
   return pctToRag(commProgress(ss).pct);
@@ -50,12 +47,12 @@ export function deriveTurnoverStatus(_p: Project, _s: SystemNode, ss: Subsystem)
 /** Roll up workflow % from real subsystem data. */
 export function deriveWorkflow(project: Project) {
   const subs = project.systems.flatMap(s => s.subsystems);
-  const n = subs.length || 1;
-  const avg = (fn: (ss: Subsystem) => number) => Math.round(subs.reduce((a, ss) => a + fn(ss), 0) / n);
-  const mc = avg(ss => mcProgress(ss).pct);
-  const comm = avg(ss => commProgress(ss).pct);
-  const handover = avg(ss => turnoverProgress(ss).pct);
-  // construction precedes MC; estimate as max(mc, current). precomm sits between mc & comm.
+  if (!subs.length) return project.workflow;
+  const n = subs.length;
+  const mcVals = project.systems.flatMap(s => s.subsystems.map(ss => mcProgress(ss, openAPunchesFor(project, s, ss).length === 0).pct));
+  const mc = Math.round(mcVals.reduce((a,b)=>a+b,0) / n);
+  const comm = Math.round(subs.reduce((a, ss) => a + commProgress(ss).pct, 0) / n);
+  const handover = Math.round(subs.reduce((a, ss) => a + turnoverProgress(ss).pct, 0) / n);
   return {
     construction: Math.max(mc, project.workflow.construction || 0),
     mc,
