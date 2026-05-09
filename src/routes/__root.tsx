@@ -108,12 +108,23 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { AppSidebar } from "@/components/AppSidebar";
+import { TopBar } from "@/components/TopBar";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <div className="flex min-h-screen w-full">
+        <AppSidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <TopBar />
+          <main className="flex-1 p-5 lg:p-7">
+            <Outlet />
+          </main>
+        </div>
+      </div>
     </QueryClientProvider>
   );
 }
