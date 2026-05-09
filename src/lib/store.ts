@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useEffect, useState } from "react";
-import type { Project, PunchItem, SystemNode, Subsystem, DocumentItem, MCCheckKey, CommCheckKey, TurnoverCheckKey } from "./types";
+import type { Project, PunchItem, SystemNode, Subsystem, DocumentItem } from "./types";
 import { deriveMcStatus, deriveCommStatus, deriveTurnoverStatus } from "./derive";
 
 const isBrowser = typeof window !== "undefined";
