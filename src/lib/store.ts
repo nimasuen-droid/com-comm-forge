@@ -88,6 +88,7 @@ interface State {
   addSubsystem: (projectId: string, sysId: string, sub: Omit<Subsystem, "id">) => void;
   updateSubsystem: (projectId: string, sysId: string, subId: string, patch: Partial<Subsystem>) => void;
   deleteSubsystem: (projectId: string, sysId: string, subId: string) => void;
+  setSubsystemCheck: (projectId: string, sysId: string, subId: string, area: "mc" | "comm" | "turnover", key: string, value: boolean) => void;
 
   addPunch: (projectId: string, p: Omit<PunchItem, "id" | "createdAt">) => void;
   updatePunch: (projectId: string, punchId: string, patch: Partial<PunchItem>) => void;
