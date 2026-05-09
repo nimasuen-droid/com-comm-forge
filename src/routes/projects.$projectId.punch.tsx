@@ -3,8 +3,9 @@ import { useMemo, useState } from "react";
 import { useStore, useProject } from "@/lib/store";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { WorkflowNav } from "@/components/WorkflowNav";
-import { Plus, Search, Trash2, RotateCcw, Check } from "lucide-react";
+import { Plus, Search, Trash2, RotateCcw, Check, Download } from "lucide-react";
 import type { Discipline, PunchCategory, PunchStatus } from "@/lib/types";
+import { exportPunchRegister } from "@/lib/exports";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 
@@ -59,6 +60,9 @@ function PunchPage() {
         <Select value={fCat} onChange={setFCat as any} options={["all", ...cats]} label="Cat" />
         <Select value={fStat} onChange={setFStat as any} options={["all", ...statuses]} label="Status" />
         <Select value={fDisc} onChange={setFDisc as any} options={["all", ...disciplines]} label="Discipline" />
+        <button onClick={() => exportPunchRegister(project)} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-3 py-2 text-xs font-semibold hover:bg-secondary/80">
+          <Download className="h-3.5 w-3.5" /> Export
+        </button>
         <button onClick={() => setShowNew(true)} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
           <Plus className="h-3.5 w-3.5" /> Raise Punch
         </button>

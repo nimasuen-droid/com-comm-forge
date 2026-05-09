@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useEffect, useState } from "react";
 import type { Project, PunchItem, SystemNode, Subsystem, DocumentItem } from "./types";
+import { deriveMcStatus, deriveCommStatus, deriveTurnoverStatus } from "./derive";
 
 const isBrowser = typeof window !== "undefined";
 
@@ -18,9 +19,9 @@ const sampleProject = (): Project => {
     priority: "Critical",
     ownerDiscipline: "Mechanical",
     subsystems: [
-      { id: "sub-ia-compressors", name: "IA Compressor Package", code: "20-IA-001", discipline: "Mechanical", tags: ["K-2001A","K-2001B"], mcStatus: "green", rfsuStatus: "amber", commStatus: "amber", turnoverStatus: "grey", preservation: { interval: 14 } },
-      { id: "sub-ia-dryers", name: "IA Dryers", code: "20-IA-002", discipline: "Mechanical", tags: ["D-2010","D-2011"], mcStatus: "amber", rfsuStatus: "red", commStatus: "red", turnoverStatus: "grey" },
-      { id: "sub-ia-distribution", name: "IA Distribution Network", code: "20-IA-003", discipline: "Piping", tags: ["L-200-IA"], mcStatus: "green", rfsuStatus: "green", commStatus: "amber", turnoverStatus: "grey" },
+      { id: "sub-ia-compressors", name: "IA Compressor Package", code: "20-IA-001", discipline: "Mechanical", tags: ["K-2001A","K-2001B"], mcStatus: "green", rfsuStatus: "amber", commStatus: "amber", turnoverStatus: "grey", preservation: { interval: 14 }, mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true, preservation: true, punchA: true }, commChecks: { energization: true, loops: true, ce: true } },
+      { id: "sub-ia-dryers", name: "IA Dryers", code: "20-IA-002", discipline: "Mechanical", tags: ["D-2010","D-2011"], mcStatus: "amber", rfsuStatus: "red", commStatus: "red", turnoverStatus: "grey", mcChecks: { walkdown: true, hydrotest: true, flushing: true } },
+      { id: "sub-ia-distribution", name: "IA Distribution Network", code: "20-IA-003", discipline: "Piping", tags: ["L-200-IA"], mcStatus: "green", rfsuStatus: "green", commStatus: "amber", turnoverStatus: "grey", mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true, preservation: true, punchA: true }, commChecks: { energization: true, loops: true } },
     ],
   };
   const sys2: SystemNode = {
@@ -31,7 +32,7 @@ const sampleProject = (): Project => {
     priority: "High",
     ownerDiscipline: "Mechanical",
     subsystems: [
-      { id: "sub-crude-pumps-train", name: "P-1001 A/B Train", code: "10-PUM-001", discipline: "Mechanical", tags: ["P-1001A","P-1001B"], mcStatus: "amber", rfsuStatus: "red", commStatus: "grey", turnoverStatus: "grey", preservation: { interval: 7 } },
+      { id: "sub-crude-pumps-train", name: "P-1001 A/B Train", code: "10-PUM-001", discipline: "Mechanical", tags: ["P-1001A","P-1001B"], mcStatus: "amber", rfsuStatus: "red", commStatus: "grey", turnoverStatus: "grey", preservation: { interval: 7 }, mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true } },
     ],
   };
   const sys3: SystemNode = {
@@ -42,8 +43,8 @@ const sampleProject = (): Project => {
     priority: "Critical",
     ownerDiscipline: "Instrumentation",
     subsystems: [
-      { id: "sub-icss-cabinet-room", name: "ICSS Cabinet Room", code: "70-ICSS-001", discipline: "Instrumentation", tags: ["UCP-01","UCP-02"], mcStatus: "green", rfsuStatus: "green", commStatus: "green", turnoverStatus: "amber" },
-      { id: "sub-fg-loops-unit-10", name: "F&G Loops Unit 10", code: "70-ICSS-FG-10", discipline: "Fire & Gas", tags: ["FG-10-LOOPS"], mcStatus: "green", rfsuStatus: "amber", commStatus: "red", turnoverStatus: "grey" },
+      { id: "sub-icss-cabinet-room", name: "ICSS Cabinet Room", code: "70-ICSS-001", discipline: "Instrumentation", tags: ["UCP-01","UCP-02"], mcStatus: "green", rfsuStatus: "green", commStatus: "green", turnoverStatus: "amber", mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true, preservation: true, punchA: true }, commChecks: { energization: true, loops: true, ce: true, functional: true, performance: true, reliability: true }, turnoverChecks: { mc: true, rfsu: true, commComplete: true } },
+      { id: "sub-fg-loops-unit-10", name: "F&G Loops Unit 10", code: "70-ICSS-FG-10", discipline: "Fire & Gas", tags: ["FG-10-LOOPS"], mcStatus: "green", rfsuStatus: "amber", commStatus: "red", turnoverStatus: "grey", mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true, preservation: true } },
     ],
   };
 
@@ -87,6 +88,7 @@ interface State {
   addSubsystem: (projectId: string, sysId: string, sub: Omit<Subsystem, "id">) => void;
   updateSubsystem: (projectId: string, sysId: string, subId: string, patch: Partial<Subsystem>) => void;
   deleteSubsystem: (projectId: string, sysId: string, subId: string) => void;
+  setSubsystemCheck: (projectId: string, sysId: string, subId: string, area: "mc" | "comm" | "turnover", key: string, value: boolean) => void;
 
   addPunch: (projectId: string, p: Omit<PunchItem, "id" | "createdAt">) => void;
   updatePunch: (projectId: string, punchId: string, patch: Partial<PunchItem>) => void;
@@ -153,6 +155,24 @@ export const useStore = create<State>()(
       deleteSubsystem: (projectId, sysId, subId) =>
         set({ projects: get().projects.map(p => p.id !== projectId ? p : { ...p, systems: p.systems.map(s => s.id !== sysId ? s : { ...s, subsystems: s.subsystems.filter(ss => ss.id !== subId) }) }) }),
 
+      setSubsystemCheck: (projectId, sysId, subId, area, key, value) => {
+        set({ projects: get().projects.map(p => {
+          if (p.id !== projectId) return p;
+          const sys = p.systems.find(s => s.id === sysId);
+          if (!sys) return p;
+          const ss = sys.subsystems.find(x => x.id === subId);
+          if (!ss) return p;
+          const field = area === "mc" ? "mcChecks" : area === "comm" ? "commChecks" : "turnoverChecks";
+          const next: Subsystem = { ...ss, [field]: { ...(ss[field] ?? {}), [key]: value } } as Subsystem;
+          // auto-derive RAG for the touched area
+          const tempProject = p;
+          if (area === "mc") next.mcStatus = deriveMcStatus(tempProject, sys, next);
+          if (area === "comm") next.commStatus = deriveCommStatus(tempProject, sys, next);
+          if (area === "turnover") next.turnoverStatus = deriveTurnoverStatus(tempProject, sys, next);
+          return { ...p, systems: p.systems.map(s => s.id !== sysId ? s : { ...s, subsystems: s.subsystems.map(x => x.id === subId ? next : x) }), updatedAt: new Date().toISOString() };
+        }) });
+      },
+
       addPunch: (projectId, p) => {
         const np: PunchItem = { id: uid(), createdAt: new Date().toISOString(), ...p };
         set({ projects: get().projects.map(pr => pr.id === projectId ? { ...pr, punches: [np, ...pr.punches] } : pr) });
@@ -173,7 +193,7 @@ export const useStore = create<State>()(
         set({ projects: get().projects.map(p => p.id === projectId ? { ...p, workflow: { ...p.workflow, ...patch } } : p) }),
     }),
     {
-      name: "ccpro-store-v2",
+      name: "ccpro-store-v3",
       storage: createJSONStorage(() =>
         isBrowser
           ? localStorage
