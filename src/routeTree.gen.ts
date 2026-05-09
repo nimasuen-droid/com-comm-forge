@@ -18,6 +18,7 @@ import { Route as ProjectsProjectIdSystemsRouteImport } from './routes/projects.
 import { Route as ProjectsProjectIdPunchRouteImport } from './routes/projects.$projectId.punch'
 import { Route as ProjectsProjectIdPreservationRouteImport } from './routes/projects.$projectId.preservation'
 import { Route as ProjectsProjectIdMcRouteImport } from './routes/projects.$projectId.mc'
+import { Route as ProjectsProjectIdDocumentsRouteImport } from './routes/projects.$projectId.documents'
 import { Route as ProjectsProjectIdCommissioningRouteImport } from './routes/projects.$projectId.commissioning'
 
 const ProjectsRoute = ProjectsRouteImport.update({
@@ -68,6 +69,12 @@ const ProjectsProjectIdMcRoute = ProjectsProjectIdMcRouteImport.update({
   path: '/mc',
   getParentRoute: () => ProjectsProjectIdRoute,
 } as any)
+const ProjectsProjectIdDocumentsRoute =
+  ProjectsProjectIdDocumentsRouteImport.update({
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
 const ProjectsProjectIdCommissioningRoute =
   ProjectsProjectIdCommissioningRouteImport.update({
     id: '/commissioning',
@@ -80,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
   '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
+  '/projects/$projectId/documents': typeof ProjectsProjectIdDocumentsRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
   '/projects/$projectId/preservation': typeof ProjectsProjectIdPreservationRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
@@ -91,6 +99,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
+  '/projects/$projectId/documents': typeof ProjectsProjectIdDocumentsRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
   '/projects/$projectId/preservation': typeof ProjectsProjectIdPreservationRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
@@ -104,6 +113,7 @@ export interface FileRoutesById {
   '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
   '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
+  '/projects/$projectId/documents': typeof ProjectsProjectIdDocumentsRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
   '/projects/$projectId/preservation': typeof ProjectsProjectIdPreservationRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/projects/$projectId'
     | '/projects/$projectId/commissioning'
+    | '/projects/$projectId/documents'
     | '/projects/$projectId/mc'
     | '/projects/$projectId/preservation'
     | '/projects/$projectId/punch'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/'
     | '/projects'
     | '/projects/$projectId/commissioning'
+    | '/projects/$projectId/documents'
     | '/projects/$projectId/mc'
     | '/projects/$projectId/preservation'
     | '/projects/$projectId/punch'
@@ -141,6 +153,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/projects/$projectId'
     | '/projects/$projectId/commissioning'
+    | '/projects/$projectId/documents'
     | '/projects/$projectId/mc'
     | '/projects/$projectId/preservation'
     | '/projects/$projectId/punch'
@@ -219,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdMcRouteImport
       parentRoute: typeof ProjectsProjectIdRoute
     }
+    '/projects/$projectId/documents': {
+      id: '/projects/$projectId/documents'
+      path: '/documents'
+      fullPath: '/projects/$projectId/documents'
+      preLoaderRoute: typeof ProjectsProjectIdDocumentsRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
     '/projects/$projectId/commissioning': {
       id: '/projects/$projectId/commissioning'
       path: '/commissioning'
@@ -231,6 +251,7 @@ declare module '@tanstack/react-router' {
 
 interface ProjectsProjectIdRouteChildren {
   ProjectsProjectIdCommissioningRoute: typeof ProjectsProjectIdCommissioningRoute
+  ProjectsProjectIdDocumentsRoute: typeof ProjectsProjectIdDocumentsRoute
   ProjectsProjectIdMcRoute: typeof ProjectsProjectIdMcRoute
   ProjectsProjectIdPreservationRoute: typeof ProjectsProjectIdPreservationRoute
   ProjectsProjectIdPunchRoute: typeof ProjectsProjectIdPunchRoute
@@ -241,6 +262,7 @@ interface ProjectsProjectIdRouteChildren {
 
 const ProjectsProjectIdRouteChildren: ProjectsProjectIdRouteChildren = {
   ProjectsProjectIdCommissioningRoute: ProjectsProjectIdCommissioningRoute,
+  ProjectsProjectIdDocumentsRoute: ProjectsProjectIdDocumentsRoute,
   ProjectsProjectIdMcRoute: ProjectsProjectIdMcRoute,
   ProjectsProjectIdPreservationRoute: ProjectsProjectIdPreservationRoute,
   ProjectsProjectIdPunchRoute: ProjectsProjectIdPunchRoute,
