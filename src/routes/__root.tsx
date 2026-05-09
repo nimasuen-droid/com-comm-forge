@@ -108,13 +108,22 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { useEffect } from "react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { TopBar } from "@/components/TopBar";
-import { useHydrated } from "@/lib/store";
+import { useStore } from "@/lib/store";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const hydrated = useHydrated();
+
+  // Trigger client-side rehydrate of the persisted store once after mount.
+  // Initial sample data is identical on server and client, so we can render
+  // immediately without gating — avoiding the "Loading workspace…" deadlock.
+  useEffect(() => {
+    if (!useStore.persist.hasHydrated()) {
+      void useStore.persist.rehydrate();
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -123,11 +132,7 @@ function RootComponent() {
         <div className="flex-1 flex flex-col min-w-0">
           <TopBar />
           <main className="flex-1 p-5 lg:p-7">
-            {hydrated ? (
-              <Outlet />
-            ) : (
-              <div className="panel p-6 text-sm text-muted-foreground">Loading workspace…</div>
-            )}
+            <Outlet />
           </main>
         </div>
       </div>
