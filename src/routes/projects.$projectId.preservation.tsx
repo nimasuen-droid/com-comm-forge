@@ -77,8 +77,8 @@ function PresPage() {
       />
 
       <WorkflowNav
-        prev={{ to: `/projects/${project.id}/turnover`, label: "Turnover" }}
-        next={{ to: `/projects/${project.id}/documents`, label: "Documentation" }}
+        prev={{ to: "/projects/$projectId/systems", projectId: project.id, label: "Systemization" }}
+        next={{ to: "/projects/$projectId/punch", projectId: project.id, label: "Punch List" }}
       />
     </div>
   );

@@ -7,8 +7,10 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
+import { hydrateStore } from "@/lib/store";
 
 function NotFoundComponent() {
   return (
@@ -113,6 +115,10 @@ import { TopBar } from "@/components/TopBar";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    hydrateStore();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

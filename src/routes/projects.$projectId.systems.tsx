@@ -115,8 +115,8 @@ function SystemsPage() {
       />
 
       <WorkflowNav
-        next={{ to: `/projects/${project.id}/punch`, label: "Punch List" }}
-        related={{ to: `/projects/${project.id}/workflow`, label: "Workflow Engine" }}
+        next={{ to: "/projects/$projectId/preservation", projectId: project.id, label: "Preservation" }}
+        related={{ to: "/projects/$projectId/workflow", projectId: project.id, label: "Workflow Engine" }}
       />
     </div>
   );

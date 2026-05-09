@@ -114,9 +114,9 @@ function PunchPage() {
       />
 
       <WorkflowNav
-        prev={{ to: `/projects/${project.id}/systems`, label: "Systemization" }}
-        next={{ to: `/projects/${project.id}/mc`, label: "Mechanical Completion" }}
-        related={{ to: `/projects/${project.id}/workflow`, label: "Workflow Engine" }}
+        prev={{ to: "/projects/$projectId/preservation", projectId: project.id, label: "Preservation" }}
+        next={{ to: "/projects/$projectId/mc", projectId: project.id, label: "Mechanical Completion" }}
+        related={{ to: "/projects/$projectId/workflow", projectId: project.id, label: "Workflow Engine" }}
       />
     </div>
   );

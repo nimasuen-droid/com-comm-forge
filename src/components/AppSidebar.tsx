@@ -6,6 +6,8 @@ import {
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
+type ProjectRoute = "/projects/$projectId/systems" | "/projects/$projectId/punch" | "/projects/$projectId/mc" | "/projects/$projectId/commissioning" | "/projects/$projectId/turnover" | "/projects/$projectId/preservation" | "/projects/$projectId/documents" | "/projects/$projectId/workflow";
+
 export function AppSidebar() {
   const pathname = useRouterState({ select: r => r.location.pathname });
   const activeId = useStore(s => s.activeProjectId);
@@ -17,14 +19,14 @@ export function AppSidebar() {
   ];
 
   const projectNav = projectExists && activeId ? [
-    { to: `/projects/${activeId}/systems`, label: "Systemization", icon: Network },
-    { to: `/projects/${activeId}/punch`, label: "Punch List", icon: ListChecks },
-    { to: `/projects/${activeId}/mc`, label: "Mechanical Completion", icon: ShieldCheck },
-    { to: `/projects/${activeId}/commissioning`, label: "Commissioning", icon: Activity },
-    { to: `/projects/${activeId}/turnover`, label: "Turnover & Handover", icon: PackageCheck },
-    { to: `/projects/${activeId}/preservation`, label: "Preservation", icon: Wrench },
-    { to: `/projects/${activeId}/documents`, label: "Documentation", icon: FileText },
-    { to: `/projects/${activeId}/workflow`, label: "Workflow Engine", icon: GitBranch },
+    { to: "/projects/$projectId/systems" as const, slug: "systems", label: "Systemization", icon: Network },
+    { to: "/projects/$projectId/preservation" as const, slug: "preservation", label: "Preservation", icon: Wrench },
+    { to: "/projects/$projectId/punch" as const, slug: "punch", label: "Punch List", icon: ListChecks },
+    { to: "/projects/$projectId/mc" as const, slug: "mc", label: "Mechanical Completion", icon: ShieldCheck },
+    { to: "/projects/$projectId/commissioning" as const, slug: "commissioning", label: "Commissioning", icon: Activity },
+    { to: "/projects/$projectId/turnover" as const, slug: "turnover", label: "Turnover & Handover", icon: PackageCheck },
+    { to: "/projects/$projectId/documents" as const, slug: "documents", label: "Documentation", icon: FileText },
+    { to: "/projects/$projectId/workflow" as const, slug: "workflow", label: "Workflow Engine", icon: GitBranch },
   ] : [];
 
   return (
@@ -52,8 +54,8 @@ export function AppSidebar() {
         {projectNav.length > 0 && (
           <Section title="Active Project">
             {projectNav.map(i => (
-              <NavItem key={i.to} to={i.to} icon={i.icon} label={i.label}
-                active={pathname.startsWith(i.to)} />
+              <ProjectNavItem key={i.to} to={i.to} projectId={activeId!} icon={i.icon} label={i.label}
+                active={pathname.startsWith(`/projects/${activeId}/${i.slug}`)} />
             ))}
           </Section>
         )}
@@ -81,6 +83,24 @@ function NavItem({ to, icon: Icon, label, active }: { to: string; icon: any; lab
   return (
     <Link
       to={to}
+      className={cn(
+        "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
+        active
+          ? "bg-sidebar-accent text-sidebar-accent-foreground border-l-2 border-primary"
+          : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+      )}
+    >
+      <Icon className="h-4 w-4 shrink-0" />
+      <span className="truncate">{label}</span>
+    </Link>
+  );
+}
+
+function ProjectNavItem({ to, projectId, icon: Icon, label, active }: { to: ProjectRoute; projectId: string; icon: any; label: string; active: boolean }) {
+  return (
+    <Link
+      to={to}
+      params={{ projectId }}
       className={cn(
         "flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors",
         active
