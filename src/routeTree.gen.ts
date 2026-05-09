@@ -16,6 +16,7 @@ import { Route as ProjectsProjectIdIndexRouteImport } from './routes/projects.$p
 import { Route as ProjectsProjectIdSystemsRouteImport } from './routes/projects.$projectId.systems'
 import { Route as ProjectsProjectIdPunchRouteImport } from './routes/projects.$projectId.punch'
 import { Route as ProjectsProjectIdMcRouteImport } from './routes/projects.$projectId.mc'
+import { Route as ProjectsProjectIdCommissioningRouteImport } from './routes/projects.$projectId.commissioning'
 
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
@@ -53,11 +54,18 @@ const ProjectsProjectIdMcRoute = ProjectsProjectIdMcRouteImport.update({
   path: '/mc',
   getParentRoute: () => ProjectsProjectIdRoute,
 } as any)
+const ProjectsProjectIdCommissioningRoute =
+  ProjectsProjectIdCommissioningRouteImport.update({
+    id: '/commissioning',
+    path: '/commissioning',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
+  '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/projects': typeof ProjectsRouteWithChildren
+  '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
@@ -76,6 +85,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
+  '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/'
     | '/projects'
     | '/projects/$projectId'
+    | '/projects/$projectId/commissioning'
     | '/projects/$projectId/mc'
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/projects'
+    | '/projects/$projectId/commissioning'
     | '/projects/$projectId/mc'
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
@@ -104,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/projects'
     | '/projects/$projectId'
+    | '/projects/$projectId/commissioning'
     | '/projects/$projectId/mc'
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
@@ -166,10 +179,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdMcRouteImport
       parentRoute: typeof ProjectsProjectIdRoute
     }
+    '/projects/$projectId/commissioning': {
+      id: '/projects/$projectId/commissioning'
+      path: '/commissioning'
+      fullPath: '/projects/$projectId/commissioning'
+      preLoaderRoute: typeof ProjectsProjectIdCommissioningRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
   }
 }
 
 interface ProjectsProjectIdRouteChildren {
+  ProjectsProjectIdCommissioningRoute: typeof ProjectsProjectIdCommissioningRoute
   ProjectsProjectIdMcRoute: typeof ProjectsProjectIdMcRoute
   ProjectsProjectIdPunchRoute: typeof ProjectsProjectIdPunchRoute
   ProjectsProjectIdSystemsRoute: typeof ProjectsProjectIdSystemsRoute
@@ -177,6 +198,7 @@ interface ProjectsProjectIdRouteChildren {
 }
 
 const ProjectsProjectIdRouteChildren: ProjectsProjectIdRouteChildren = {
+  ProjectsProjectIdCommissioningRoute: ProjectsProjectIdCommissioningRoute,
   ProjectsProjectIdMcRoute: ProjectsProjectIdMcRoute,
   ProjectsProjectIdPunchRoute: ProjectsProjectIdPunchRoute,
   ProjectsProjectIdSystemsRoute: ProjectsProjectIdSystemsRoute,
