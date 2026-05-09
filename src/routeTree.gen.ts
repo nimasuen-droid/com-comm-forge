@@ -16,6 +16,7 @@ import { Route as ProjectsProjectIdIndexRouteImport } from './routes/projects.$p
 import { Route as ProjectsProjectIdTurnoverRouteImport } from './routes/projects.$projectId.turnover'
 import { Route as ProjectsProjectIdSystemsRouteImport } from './routes/projects.$projectId.systems'
 import { Route as ProjectsProjectIdPunchRouteImport } from './routes/projects.$projectId.punch'
+import { Route as ProjectsProjectIdPreservationRouteImport } from './routes/projects.$projectId.preservation'
 import { Route as ProjectsProjectIdMcRouteImport } from './routes/projects.$projectId.mc'
 import { Route as ProjectsProjectIdCommissioningRouteImport } from './routes/projects.$projectId.commissioning'
 
@@ -56,6 +57,12 @@ const ProjectsProjectIdPunchRoute = ProjectsProjectIdPunchRouteImport.update({
   path: '/punch',
   getParentRoute: () => ProjectsProjectIdRoute,
 } as any)
+const ProjectsProjectIdPreservationRoute =
+  ProjectsProjectIdPreservationRouteImport.update({
+    id: '/preservation',
+    path: '/preservation',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
 const ProjectsProjectIdMcRoute = ProjectsProjectIdMcRouteImport.update({
   id: '/mc',
   path: '/mc',
@@ -74,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
   '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
+  '/projects/$projectId/preservation': typeof ProjectsProjectIdPreservationRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
   '/projects/$projectId/turnover': typeof ProjectsProjectIdTurnoverRoute
@@ -84,6 +92,7 @@ export interface FileRoutesByTo {
   '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
+  '/projects/$projectId/preservation': typeof ProjectsProjectIdPreservationRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
   '/projects/$projectId/turnover': typeof ProjectsProjectIdTurnoverRoute
@@ -96,6 +105,7 @@ export interface FileRoutesById {
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
   '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
   '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
+  '/projects/$projectId/preservation': typeof ProjectsProjectIdPreservationRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
   '/projects/$projectId/turnover': typeof ProjectsProjectIdTurnoverRoute
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/projects/$projectId/commissioning'
     | '/projects/$projectId/mc'
+    | '/projects/$projectId/preservation'
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
     | '/projects/$projectId/turnover'
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/projects'
     | '/projects/$projectId/commissioning'
     | '/projects/$projectId/mc'
+    | '/projects/$projectId/preservation'
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
     | '/projects/$projectId/turnover'
@@ -130,6 +142,7 @@ export interface FileRouteTypes {
     | '/projects/$projectId'
     | '/projects/$projectId/commissioning'
     | '/projects/$projectId/mc'
+    | '/projects/$projectId/preservation'
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
     | '/projects/$projectId/turnover'
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdPunchRouteImport
       parentRoute: typeof ProjectsProjectIdRoute
     }
+    '/projects/$projectId/preservation': {
+      id: '/projects/$projectId/preservation'
+      path: '/preservation'
+      fullPath: '/projects/$projectId/preservation'
+      preLoaderRoute: typeof ProjectsProjectIdPreservationRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
     '/projects/$projectId/mc': {
       id: '/projects/$projectId/mc'
       path: '/mc'
@@ -212,6 +232,7 @@ declare module '@tanstack/react-router' {
 interface ProjectsProjectIdRouteChildren {
   ProjectsProjectIdCommissioningRoute: typeof ProjectsProjectIdCommissioningRoute
   ProjectsProjectIdMcRoute: typeof ProjectsProjectIdMcRoute
+  ProjectsProjectIdPreservationRoute: typeof ProjectsProjectIdPreservationRoute
   ProjectsProjectIdPunchRoute: typeof ProjectsProjectIdPunchRoute
   ProjectsProjectIdSystemsRoute: typeof ProjectsProjectIdSystemsRoute
   ProjectsProjectIdTurnoverRoute: typeof ProjectsProjectIdTurnoverRoute
@@ -221,6 +242,7 @@ interface ProjectsProjectIdRouteChildren {
 const ProjectsProjectIdRouteChildren: ProjectsProjectIdRouteChildren = {
   ProjectsProjectIdCommissioningRoute: ProjectsProjectIdCommissioningRoute,
   ProjectsProjectIdMcRoute: ProjectsProjectIdMcRoute,
+  ProjectsProjectIdPreservationRoute: ProjectsProjectIdPreservationRoute,
   ProjectsProjectIdPunchRoute: ProjectsProjectIdPunchRoute,
   ProjectsProjectIdSystemsRoute: ProjectsProjectIdSystemsRoute,
   ProjectsProjectIdTurnoverRoute: ProjectsProjectIdTurnoverRoute,
