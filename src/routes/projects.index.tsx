@@ -6,7 +6,7 @@ import { PercentBar } from "@/components/StatusBits";
 import { Plus, Copy, Archive, ArchiveRestore, Trash2, Download, Upload, FolderOpen } from "lucide-react";
 import type { Project } from "@/lib/types";
 
-export const Route = createFileRoute("/projects")({
+export const Route = createFileRoute("/projects/")({
   head: () => ({ meta: [{ title: "Projects — Completions & Commissioning Pro" }] }),
   component: ProjectsPage,
 });
