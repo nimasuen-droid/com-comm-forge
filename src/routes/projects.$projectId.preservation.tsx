@@ -1,8 +1,9 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useProject, useStore } from "@/lib/store";
+import { exportPreservation } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { WorkflowNav } from "@/components/WorkflowNav";
-import { Wrench, CalendarClock } from "lucide-react";
+import { Wrench, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/projects/$projectId/preservation")({
@@ -18,7 +19,12 @@ function PresPage() {
 
   return (
     <div className="space-y-5">
-      <h2 className="text-xl font-bold flex items-center gap-2"><Wrench className="h-5 w-5 text-info" /> Preservation Register</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold flex items-center gap-2"><Wrench className="h-5 w-5 text-info" /> Preservation Register</h2>
+        <button onClick={() => exportPreservation(project)} className="inline-flex items-center gap-1.5 rounded-md border border-border bg-secondary px-3 py-2 text-xs font-semibold hover:bg-secondary/80">
+          <Download className="h-3.5 w-3.5" /> Export Log
+        </button>
+      </div>
 
       <div className="panel overflow-x-auto">
         <table className="w-full text-sm">
