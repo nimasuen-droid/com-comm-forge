@@ -155,6 +155,24 @@ export const useStore = create<State>()(
       deleteSubsystem: (projectId, sysId, subId) =>
         set({ projects: get().projects.map(p => p.id !== projectId ? p : { ...p, systems: p.systems.map(s => s.id !== sysId ? s : { ...s, subsystems: s.subsystems.filter(ss => ss.id !== subId) }) }) }),
 
+      setSubsystemCheck: (projectId, sysId, subId, area, key, value) => {
+        set({ projects: get().projects.map(p => {
+          if (p.id !== projectId) return p;
+          const sys = p.systems.find(s => s.id === sysId);
+          if (!sys) return p;
+          const ss = sys.subsystems.find(x => x.id === subId);
+          if (!ss) return p;
+          const field = area === "mc" ? "mcChecks" : area === "comm" ? "commChecks" : "turnoverChecks";
+          const next: Subsystem = { ...ss, [field]: { ...(ss[field] ?? {}), [key]: value } } as Subsystem;
+          // auto-derive RAG for the touched area
+          const tempProject = p;
+          if (area === "mc") next.mcStatus = deriveMcStatus(tempProject, sys, next);
+          if (area === "comm") next.commStatus = deriveCommStatus(tempProject, sys, next);
+          if (area === "turnover") next.turnoverStatus = deriveTurnoverStatus(tempProject, sys, next);
+          return { ...p, systems: p.systems.map(s => s.id !== sysId ? s : { ...s, subsystems: s.subsystems.map(x => x.id === subId ? next : x) }), updatedAt: new Date().toISOString() };
+        }) });
+      },
+
       addPunch: (projectId, p) => {
         const np: PunchItem = { id: uid(), createdAt: new Date().toISOString(), ...p };
         set({ projects: get().projects.map(pr => pr.id === projectId ? { ...pr, punches: [np, ...pr.punches] } : pr) });
