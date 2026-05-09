@@ -46,6 +46,7 @@ function PunchPage() {
 
   return (
     <div className="space-y-5">
+      <LearnRail module="punch" title="Learn: Punch List" />
       <div className="grid grid-cols-3 gap-3">
         <CatStat cat="A" tone="destructive" stats={stats.A} desc="Blocks MC / RFSU" />
         <CatStat cat="B" tone="warning" stats={stats.B} desc="Blocks Operations" />
