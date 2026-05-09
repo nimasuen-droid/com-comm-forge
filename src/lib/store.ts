@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useEffect, useState } from "react";
-import type { Project, PunchItem, SystemNode, Subsystem, DocumentItem } from "./types";
+import type { Project, PunchItem, SystemNode, Subsystem, DocumentItem, MCCheckKey, CommCheckKey, TurnoverCheckKey } from "./types";
+import { deriveMcStatus, deriveCommStatus, deriveTurnoverStatus } from "./derive";
 
 const isBrowser = typeof window !== "undefined";
 
@@ -18,9 +19,9 @@ const sampleProject = (): Project => {
     priority: "Critical",
     ownerDiscipline: "Mechanical",
     subsystems: [
-      { id: "sub-ia-compressors", name: "IA Compressor Package", code: "20-IA-001", discipline: "Mechanical", tags: ["K-2001A","K-2001B"], mcStatus: "green", rfsuStatus: "amber", commStatus: "amber", turnoverStatus: "grey", preservation: { interval: 14 } },
-      { id: "sub-ia-dryers", name: "IA Dryers", code: "20-IA-002", discipline: "Mechanical", tags: ["D-2010","D-2011"], mcStatus: "amber", rfsuStatus: "red", commStatus: "red", turnoverStatus: "grey" },
-      { id: "sub-ia-distribution", name: "IA Distribution Network", code: "20-IA-003", discipline: "Piping", tags: ["L-200-IA"], mcStatus: "green", rfsuStatus: "green", commStatus: "amber", turnoverStatus: "grey" },
+      { id: "sub-ia-compressors", name: "IA Compressor Package", code: "20-IA-001", discipline: "Mechanical", tags: ["K-2001A","K-2001B"], mcStatus: "green", rfsuStatus: "amber", commStatus: "amber", turnoverStatus: "grey", preservation: { interval: 14 }, mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true, preservation: true, punchA: true }, commChecks: { energization: true, loops: true, ce: true } },
+      { id: "sub-ia-dryers", name: "IA Dryers", code: "20-IA-002", discipline: "Mechanical", tags: ["D-2010","D-2011"], mcStatus: "amber", rfsuStatus: "red", commStatus: "red", turnoverStatus: "grey", mcChecks: { walkdown: true, hydrotest: true, flushing: true } },
+      { id: "sub-ia-distribution", name: "IA Distribution Network", code: "20-IA-003", discipline: "Piping", tags: ["L-200-IA"], mcStatus: "green", rfsuStatus: "green", commStatus: "amber", turnoverStatus: "grey", mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true, preservation: true, punchA: true }, commChecks: { energization: true, loops: true } },
     ],
   };
   const sys2: SystemNode = {
@@ -31,7 +32,7 @@ const sampleProject = (): Project => {
     priority: "High",
     ownerDiscipline: "Mechanical",
     subsystems: [
-      { id: "sub-crude-pumps-train", name: "P-1001 A/B Train", code: "10-PUM-001", discipline: "Mechanical", tags: ["P-1001A","P-1001B"], mcStatus: "amber", rfsuStatus: "red", commStatus: "grey", turnoverStatus: "grey", preservation: { interval: 7 } },
+      { id: "sub-crude-pumps-train", name: "P-1001 A/B Train", code: "10-PUM-001", discipline: "Mechanical", tags: ["P-1001A","P-1001B"], mcStatus: "amber", rfsuStatus: "red", commStatus: "grey", turnoverStatus: "grey", preservation: { interval: 7 }, mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true } },
     ],
   };
   const sys3: SystemNode = {
@@ -42,8 +43,8 @@ const sampleProject = (): Project => {
     priority: "Critical",
     ownerDiscipline: "Instrumentation",
     subsystems: [
-      { id: "sub-icss-cabinet-room", name: "ICSS Cabinet Room", code: "70-ICSS-001", discipline: "Instrumentation", tags: ["UCP-01","UCP-02"], mcStatus: "green", rfsuStatus: "green", commStatus: "green", turnoverStatus: "amber" },
-      { id: "sub-fg-loops-unit-10", name: "F&G Loops Unit 10", code: "70-ICSS-FG-10", discipline: "Fire & Gas", tags: ["FG-10-LOOPS"], mcStatus: "green", rfsuStatus: "amber", commStatus: "red", turnoverStatus: "grey" },
+      { id: "sub-icss-cabinet-room", name: "ICSS Cabinet Room", code: "70-ICSS-001", discipline: "Instrumentation", tags: ["UCP-01","UCP-02"], mcStatus: "green", rfsuStatus: "green", commStatus: "green", turnoverStatus: "amber", mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true, preservation: true, punchA: true }, commChecks: { energization: true, loops: true, ce: true, functional: true, performance: true, reliability: true }, turnoverChecks: { mc: true, rfsu: true, commComplete: true } },
+      { id: "sub-fg-loops-unit-10", name: "F&G Loops Unit 10", code: "70-ICSS-FG-10", discipline: "Fire & Gas", tags: ["FG-10-LOOPS"], mcStatus: "green", rfsuStatus: "amber", commStatus: "red", turnoverStatus: "grey", mcChecks: { walkdown: true, hydrotest: true, flushing: true, reinstatement: true, preservation: true } },
     ],
   };
 
