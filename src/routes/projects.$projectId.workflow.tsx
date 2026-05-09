@@ -3,6 +3,7 @@ import { useProject } from "@/lib/store";
 import { deriveWorkflow } from "@/lib/derive";
 import { PercentBar } from "@/components/StatusBits";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
+import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { GitBranch, ArrowRight } from "lucide-react";
 
@@ -27,6 +28,7 @@ function WorkflowPage() {
 
   return (
     <div className="space-y-5">
+      <LearnRail module="workflow" title="Learn: Workflow" />
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold flex items-center gap-2"><GitBranch className="h-5 w-5 text-accent" /> Workflow Engine</h2>
         <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Auto-derived from MC, Commissioning & Turnover modules</span>

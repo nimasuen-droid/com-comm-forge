@@ -4,6 +4,7 @@ import { ragColor } from "@/lib/kpi";
 import { commProgress, COMM_CHECK_LABELS } from "@/lib/derive";
 import { COMM_CHECK_KEYS } from "@/lib/types";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
+import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { Activity, Zap, Cpu, Flame, Wind, Droplets, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -28,6 +29,7 @@ function CommPage() {
 
   return (
     <div className="space-y-5">
+      <LearnRail module="commissioning" title="Learn: Commissioning" />
       <h2 className="text-xl font-bold flex items-center gap-2"><Activity className="h-5 w-5 text-primary" /> Commissioning Sequence</h2>
 
       <div className="panel p-5">

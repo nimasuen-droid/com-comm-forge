@@ -2,6 +2,7 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useStore, useProject } from "@/lib/store";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
+import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { Plus, Search, Trash2, RotateCcw, Check, Download } from "lucide-react";
 import type { Discipline, PunchCategory, PunchStatus } from "@/lib/types";
@@ -45,6 +46,7 @@ function PunchPage() {
 
   return (
     <div className="space-y-5">
+      <LearnRail module="punch" title="Learn: Punch List" />
       <div className="grid grid-cols-3 gap-3">
         <CatStat cat="A" tone="destructive" stats={stats.A} desc="Blocks MC / RFSU" />
         <CatStat cat="B" tone="warning" stats={stats.B} desc="Blocks Operations" />

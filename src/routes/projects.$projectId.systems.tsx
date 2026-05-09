@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useStore, useProject } from "@/lib/store";
 import { ragDot } from "@/lib/kpi";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
+import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { Plus, ChevronRight, ChevronDown, Trash2 } from "lucide-react";
 import type { Discipline, RAG, SystemPriority } from "@/lib/types";
@@ -30,6 +31,7 @@ function SystemsPage() {
 
   return (
     <div className="space-y-5">
+      <LearnRail module="systems" title="Learn: Systemization" />
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">Systemization</h2>
         <button onClick={() => setShowNewSys(true)} className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
