@@ -8,9 +8,9 @@ export function pctToRag(pct: number): RAG {
   return "grey";
 }
 
-export function mcProgress(ss: Subsystem) {
+export function mcProgress(ss: Subsystem, openAClear?: boolean) {
   const c = ss.mcChecks ?? {};
-  const done = MC_CHECK_KEYS.filter(k => c[k]).length;
+  const done = MC_CHECK_KEYS.filter(k => k === "punchA" ? (openAClear ?? c[k]) : c[k]).length;
   return { done, total: MC_CHECK_KEYS.length, pct: Math.round(done / MC_CHECK_KEYS.length * 100) };
 }
 export function commProgress(ss: Subsystem) {
