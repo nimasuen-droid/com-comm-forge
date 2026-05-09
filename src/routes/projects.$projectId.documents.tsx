@@ -62,8 +62,8 @@ function DocsPage() {
       />
 
       <WorkflowNav
-        prev={{ to: `/projects/${project.id}/preservation`, label: "Preservation" }}
-        next={{ to: `/projects/${project.id}/workflow`, label: "Workflow Engine" }}
+        prev={{ to: "/projects/$projectId/preservation", projectId: project.id, label: "Preservation" }}
+        next={{ to: "/projects/$projectId/workflow", projectId: project.id, label: "Workflow Engine" }}
       />
     </div>
   );

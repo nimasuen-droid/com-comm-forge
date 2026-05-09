@@ -7,10 +7,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect } from "react";
 
 import appCss from "../styles.css?url";
-import { hydrateStore } from "@/lib/store";
 
 function NotFoundComponent() {
   return (
@@ -112,13 +110,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 import { AppSidebar } from "@/components/AppSidebar";
 import { TopBar } from "@/components/TopBar";
+import { useHydrated } from "@/lib/store";
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-
-  useEffect(() => {
-    hydrateStore();
-  }, []);
+  const hydrated = useHydrated();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -127,7 +123,11 @@ function RootComponent() {
         <div className="flex-1 flex flex-col min-w-0">
           <TopBar />
           <main className="flex-1 p-5 lg:p-7">
-            <Outlet />
+            {hydrated ? (
+              <Outlet />
+            ) : (
+              <div className="panel p-6 text-sm text-muted-foreground">Loading workspace…</div>
+            )}
           </main>
         </div>
       </div>

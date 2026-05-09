@@ -71,7 +71,7 @@ function WorkflowPage() {
         best={<>Hard gate every transition. Use this workflow as the single source of truth across construction, commissioning, vendors, and operations.</>}
       />
 
-      <WorkflowNav prev={{ to: `/projects/${project.id}/documents`, label: "Documentation" }} />
+      <WorkflowNav prev={{ to: "/projects/$projectId/documents", projectId: project.id, label: "Documentation" }} />
     </div>
   );
 }
