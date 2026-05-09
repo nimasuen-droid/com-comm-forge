@@ -193,7 +193,7 @@ export const useStore = create<State>()(
         set({ projects: get().projects.map(p => p.id === projectId ? { ...p, workflow: { ...p.workflow, ...patch } } : p) }),
     }),
     {
-      name: "ccpro-store-v2",
+      name: "ccpro-store-v3",
       storage: createJSONStorage(() =>
         isBrowser
           ? localStorage
