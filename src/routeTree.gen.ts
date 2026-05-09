@@ -15,6 +15,7 @@ import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projec
 import { Route as ProjectsProjectIdIndexRouteImport } from './routes/projects.$projectId.index'
 import { Route as ProjectsProjectIdSystemsRouteImport } from './routes/projects.$projectId.systems'
 import { Route as ProjectsProjectIdPunchRouteImport } from './routes/projects.$projectId.punch'
+import { Route as ProjectsProjectIdMcRouteImport } from './routes/projects.$projectId.mc'
 
 const ProjectsRoute = ProjectsRouteImport.update({
   id: '/projects',
@@ -47,11 +48,17 @@ const ProjectsProjectIdPunchRoute = ProjectsProjectIdPunchRouteImport.update({
   path: '/punch',
   getParentRoute: () => ProjectsProjectIdRoute,
 } as any)
+const ProjectsProjectIdMcRoute = ProjectsProjectIdMcRouteImport.update({
+  id: '/mc',
+  path: '/mc',
+  getParentRoute: () => ProjectsProjectIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
+  '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
   '/projects/$projectId/': typeof ProjectsProjectIdIndexRoute
@@ -59,6 +66,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/projects': typeof ProjectsRouteWithChildren
+  '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
   '/projects/$projectId': typeof ProjectsProjectIdIndexRoute
@@ -68,6 +76,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
+  '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
   '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
   '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
   '/projects/$projectId/': typeof ProjectsProjectIdIndexRoute
@@ -78,6 +87,7 @@ export interface FileRouteTypes {
     | '/'
     | '/projects'
     | '/projects/$projectId'
+    | '/projects/$projectId/mc'
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
     | '/projects/$projectId/'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/projects'
+    | '/projects/$projectId/mc'
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
     | '/projects/$projectId'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '/'
     | '/projects'
     | '/projects/$projectId'
+    | '/projects/$projectId/mc'
     | '/projects/$projectId/punch'
     | '/projects/$projectId/systems'
     | '/projects/$projectId/'
@@ -147,16 +159,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectIdPunchRouteImport
       parentRoute: typeof ProjectsProjectIdRoute
     }
+    '/projects/$projectId/mc': {
+      id: '/projects/$projectId/mc'
+      path: '/mc'
+      fullPath: '/projects/$projectId/mc'
+      preLoaderRoute: typeof ProjectsProjectIdMcRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
   }
 }
 
 interface ProjectsProjectIdRouteChildren {
+  ProjectsProjectIdMcRoute: typeof ProjectsProjectIdMcRoute
   ProjectsProjectIdPunchRoute: typeof ProjectsProjectIdPunchRoute
   ProjectsProjectIdSystemsRoute: typeof ProjectsProjectIdSystemsRoute
   ProjectsProjectIdIndexRoute: typeof ProjectsProjectIdIndexRoute
 }
 
 const ProjectsProjectIdRouteChildren: ProjectsProjectIdRouteChildren = {
+  ProjectsProjectIdMcRoute: ProjectsProjectIdMcRoute,
   ProjectsProjectIdPunchRoute: ProjectsProjectIdPunchRoute,
   ProjectsProjectIdSystemsRoute: ProjectsProjectIdSystemsRoute,
   ProjectsProjectIdIndexRoute: ProjectsProjectIdIndexRoute,
@@ -184,3 +205,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
