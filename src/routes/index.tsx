@@ -16,8 +16,9 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const projects = useStore(s => s.projects.filter(p => !p.archived));
+  const allProjects = useStore(s => s.projects);
   const setActive = useStore(s => s.setActive);
+  const projects = allProjects.filter(p => !p.archived);
 
   const totals = projects.reduce((acc, p) => {
     const k = projectKpis(p);
