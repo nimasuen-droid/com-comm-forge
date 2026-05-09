@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { useEffect, useState } from "react";
 import type { Project, PunchItem, SystemNode, Subsystem, DocumentItem } from "./types";
+
+const isBrowser = typeof window !== "undefined";
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 const SAMPLE_NOW = "2026-01-15T12:00:00.000Z";
@@ -171,7 +174,11 @@ export const useStore = create<State>()(
     }),
     {
       name: "ccpro-store-v2",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() =>
+        isBrowser
+          ? localStorage
+          : ({ getItem: () => null, setItem: () => {}, removeItem: () => {} } as Storage)
+      ),
       skipHydration: true,
     }
   )
@@ -179,6 +186,29 @@ export const useStore = create<State>()(
 
 export const hydrateStore = () => useStore.persist.rehydrate();
 export const hasHydratedStore = () => useStore.persist.hasHydrated();
+
+/** Returns true only after the client has mounted and rehydrated the store.
+ *  Always returns false during SSR and on the very first client render to
+ *  guarantee identical server/client HTML and avoid hydration mismatches. */
+export function useHydrated() {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    const finish = () => { if (!cancelled) setHydrated(true); };
+    if (useStore.persist.hasHydrated()) {
+      finish();
+    } else {
+      const p = useStore.persist.rehydrate();
+      if (p && typeof (p as Promise<unknown>).then === "function") {
+        (p as Promise<unknown>).then(finish, finish);
+      } else {
+        finish();
+      }
+    }
+    return () => { cancelled = true; };
+  }, []);
+  return hydrated;
+}
 
 export const useProject = (id: string | undefined) =>
   useStore(s => s.projects.find(p => p.id === id));
