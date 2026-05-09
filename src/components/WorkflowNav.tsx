@@ -1,0 +1,38 @@
+import { Link } from "@tanstack/react-router";
+import { ArrowLeft, ArrowRight, GitBranch, Link2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface Step {
+  to: string;
+  label: string;
+}
+
+export function WorkflowNav({ prev, next, related, dependency, className }: {
+  prev?: Step; next?: Step; related?: Step; dependency?: Step; className?: string;
+}) {
+  return (
+    <div className={cn("panel p-3 flex flex-wrap items-center gap-2", className)}>
+      {prev && (
+        <Link to={prev.to} className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary/50 px-3 py-2 text-xs font-medium hover:bg-secondary">
+          <ArrowLeft className="h-3.5 w-3.5" /> Previous · {prev.label}
+        </Link>
+      )}
+      {dependency && (
+        <Link to={dependency.to} className="inline-flex items-center gap-2 rounded-md border border-info/40 bg-info/10 px-3 py-2 text-xs font-medium text-info hover:bg-info/20">
+          <Link2 className="h-3.5 w-3.5" /> Upstream · {dependency.label}
+        </Link>
+      )}
+      {related && (
+        <Link to={related.to} className="inline-flex items-center gap-2 rounded-md border border-accent/40 bg-accent/10 px-3 py-2 text-xs font-medium text-accent hover:bg-accent/20">
+          <GitBranch className="h-3.5 w-3.5" /> Related · {related.label}
+        </Link>
+      )}
+      <div className="flex-1" />
+      {next && (
+        <Link to={next.to} className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90">
+          Next · {next.label} <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+      )}
+    </div>
+  );
+}

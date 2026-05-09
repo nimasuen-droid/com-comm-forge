@@ -9,38 +9,186 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProjectsProjectIdRouteImport } from './routes/projects.$projectId'
+import { Route as ProjectsProjectIdIndexRouteImport } from './routes/projects.$projectId.index'
+import { Route as ProjectsProjectIdWorkflowRouteImport } from './routes/projects.$projectId.workflow'
+import { Route as ProjectsProjectIdTurnoverRouteImport } from './routes/projects.$projectId.turnover'
+import { Route as ProjectsProjectIdSystemsRouteImport } from './routes/projects.$projectId.systems'
+import { Route as ProjectsProjectIdPunchRouteImport } from './routes/projects.$projectId.punch'
+import { Route as ProjectsProjectIdPreservationRouteImport } from './routes/projects.$projectId.preservation'
+import { Route as ProjectsProjectIdMcRouteImport } from './routes/projects.$projectId.mc'
+import { Route as ProjectsProjectIdDocumentsRouteImport } from './routes/projects.$projectId.documents'
+import { Route as ProjectsProjectIdCommissioningRouteImport } from './routes/projects.$projectId.commissioning'
 
+const ProjectsRoute = ProjectsRouteImport.update({
+  id: '/projects',
+  path: '/projects',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
+  id: '/$projectId',
+  path: '/$projectId',
+  getParentRoute: () => ProjectsRoute,
+} as any)
+const ProjectsProjectIdIndexRoute = ProjectsProjectIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectsProjectIdRoute,
+} as any)
+const ProjectsProjectIdWorkflowRoute =
+  ProjectsProjectIdWorkflowRouteImport.update({
+    id: '/workflow',
+    path: '/workflow',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
+const ProjectsProjectIdTurnoverRoute =
+  ProjectsProjectIdTurnoverRouteImport.update({
+    id: '/turnover',
+    path: '/turnover',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
+const ProjectsProjectIdSystemsRoute =
+  ProjectsProjectIdSystemsRouteImport.update({
+    id: '/systems',
+    path: '/systems',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
+const ProjectsProjectIdPunchRoute = ProjectsProjectIdPunchRouteImport.update({
+  id: '/punch',
+  path: '/punch',
+  getParentRoute: () => ProjectsProjectIdRoute,
+} as any)
+const ProjectsProjectIdPreservationRoute =
+  ProjectsProjectIdPreservationRouteImport.update({
+    id: '/preservation',
+    path: '/preservation',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
+const ProjectsProjectIdMcRoute = ProjectsProjectIdMcRouteImport.update({
+  id: '/mc',
+  path: '/mc',
+  getParentRoute: () => ProjectsProjectIdRoute,
+} as any)
+const ProjectsProjectIdDocumentsRoute =
+  ProjectsProjectIdDocumentsRouteImport.update({
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
+const ProjectsProjectIdCommissioningRoute =
+  ProjectsProjectIdCommissioningRouteImport.update({
+    id: '/commissioning',
+    path: '/commissioning',
+    getParentRoute: () => ProjectsProjectIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/projects': typeof ProjectsRouteWithChildren
+  '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
+  '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
+  '/projects/$projectId/documents': typeof ProjectsProjectIdDocumentsRoute
+  '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
+  '/projects/$projectId/preservation': typeof ProjectsProjectIdPreservationRoute
+  '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
+  '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
+  '/projects/$projectId/turnover': typeof ProjectsProjectIdTurnoverRoute
+  '/projects/$projectId/workflow': typeof ProjectsProjectIdWorkflowRoute
+  '/projects/$projectId/': typeof ProjectsProjectIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/projects': typeof ProjectsRouteWithChildren
+  '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
+  '/projects/$projectId/documents': typeof ProjectsProjectIdDocumentsRoute
+  '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
+  '/projects/$projectId/preservation': typeof ProjectsProjectIdPreservationRoute
+  '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
+  '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
+  '/projects/$projectId/turnover': typeof ProjectsProjectIdTurnoverRoute
+  '/projects/$projectId/workflow': typeof ProjectsProjectIdWorkflowRoute
+  '/projects/$projectId': typeof ProjectsProjectIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/projects': typeof ProjectsRouteWithChildren
+  '/projects/$projectId': typeof ProjectsProjectIdRouteWithChildren
+  '/projects/$projectId/commissioning': typeof ProjectsProjectIdCommissioningRoute
+  '/projects/$projectId/documents': typeof ProjectsProjectIdDocumentsRoute
+  '/projects/$projectId/mc': typeof ProjectsProjectIdMcRoute
+  '/projects/$projectId/preservation': typeof ProjectsProjectIdPreservationRoute
+  '/projects/$projectId/punch': typeof ProjectsProjectIdPunchRoute
+  '/projects/$projectId/systems': typeof ProjectsProjectIdSystemsRoute
+  '/projects/$projectId/turnover': typeof ProjectsProjectIdTurnoverRoute
+  '/projects/$projectId/workflow': typeof ProjectsProjectIdWorkflowRoute
+  '/projects/$projectId/': typeof ProjectsProjectIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/projects'
+    | '/projects/$projectId'
+    | '/projects/$projectId/commissioning'
+    | '/projects/$projectId/documents'
+    | '/projects/$projectId/mc'
+    | '/projects/$projectId/preservation'
+    | '/projects/$projectId/punch'
+    | '/projects/$projectId/systems'
+    | '/projects/$projectId/turnover'
+    | '/projects/$projectId/workflow'
+    | '/projects/$projectId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/projects'
+    | '/projects/$projectId/commissioning'
+    | '/projects/$projectId/documents'
+    | '/projects/$projectId/mc'
+    | '/projects/$projectId/preservation'
+    | '/projects/$projectId/punch'
+    | '/projects/$projectId/systems'
+    | '/projects/$projectId/turnover'
+    | '/projects/$projectId/workflow'
+    | '/projects/$projectId'
+  id:
+    | '__root__'
+    | '/'
+    | '/projects'
+    | '/projects/$projectId'
+    | '/projects/$projectId/commissioning'
+    | '/projects/$projectId/documents'
+    | '/projects/$projectId/mc'
+    | '/projects/$projectId/preservation'
+    | '/projects/$projectId/punch'
+    | '/projects/$projectId/systems'
+    | '/projects/$projectId/turnover'
+    | '/projects/$projectId/workflow'
+    | '/projects/$projectId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProjectsRoute: typeof ProjectsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/projects': {
+      id: '/projects'
+      path: '/projects'
+      fullPath: '/projects'
+      preLoaderRoute: typeof ProjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +196,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/$projectId': {
+      id: '/projects/$projectId'
+      path: '/$projectId'
+      fullPath: '/projects/$projectId'
+      preLoaderRoute: typeof ProjectsProjectIdRouteImport
+      parentRoute: typeof ProjectsRoute
+    }
+    '/projects/$projectId/': {
+      id: '/projects/$projectId/'
+      path: '/'
+      fullPath: '/projects/$projectId/'
+      preLoaderRoute: typeof ProjectsProjectIdIndexRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
+    '/projects/$projectId/workflow': {
+      id: '/projects/$projectId/workflow'
+      path: '/workflow'
+      fullPath: '/projects/$projectId/workflow'
+      preLoaderRoute: typeof ProjectsProjectIdWorkflowRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
+    '/projects/$projectId/turnover': {
+      id: '/projects/$projectId/turnover'
+      path: '/turnover'
+      fullPath: '/projects/$projectId/turnover'
+      preLoaderRoute: typeof ProjectsProjectIdTurnoverRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
+    '/projects/$projectId/systems': {
+      id: '/projects/$projectId/systems'
+      path: '/systems'
+      fullPath: '/projects/$projectId/systems'
+      preLoaderRoute: typeof ProjectsProjectIdSystemsRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
+    '/projects/$projectId/punch': {
+      id: '/projects/$projectId/punch'
+      path: '/punch'
+      fullPath: '/projects/$projectId/punch'
+      preLoaderRoute: typeof ProjectsProjectIdPunchRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
+    '/projects/$projectId/preservation': {
+      id: '/projects/$projectId/preservation'
+      path: '/preservation'
+      fullPath: '/projects/$projectId/preservation'
+      preLoaderRoute: typeof ProjectsProjectIdPreservationRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
+    '/projects/$projectId/mc': {
+      id: '/projects/$projectId/mc'
+      path: '/mc'
+      fullPath: '/projects/$projectId/mc'
+      preLoaderRoute: typeof ProjectsProjectIdMcRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
+    '/projects/$projectId/documents': {
+      id: '/projects/$projectId/documents'
+      path: '/documents'
+      fullPath: '/projects/$projectId/documents'
+      preLoaderRoute: typeof ProjectsProjectIdDocumentsRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
+    '/projects/$projectId/commissioning': {
+      id: '/projects/$projectId/commissioning'
+      path: '/commissioning'
+      fullPath: '/projects/$projectId/commissioning'
+      preLoaderRoute: typeof ProjectsProjectIdCommissioningRouteImport
+      parentRoute: typeof ProjectsProjectIdRoute
+    }
   }
 }
 
+interface ProjectsProjectIdRouteChildren {
+  ProjectsProjectIdCommissioningRoute: typeof ProjectsProjectIdCommissioningRoute
+  ProjectsProjectIdDocumentsRoute: typeof ProjectsProjectIdDocumentsRoute
+  ProjectsProjectIdMcRoute: typeof ProjectsProjectIdMcRoute
+  ProjectsProjectIdPreservationRoute: typeof ProjectsProjectIdPreservationRoute
+  ProjectsProjectIdPunchRoute: typeof ProjectsProjectIdPunchRoute
+  ProjectsProjectIdSystemsRoute: typeof ProjectsProjectIdSystemsRoute
+  ProjectsProjectIdTurnoverRoute: typeof ProjectsProjectIdTurnoverRoute
+  ProjectsProjectIdWorkflowRoute: typeof ProjectsProjectIdWorkflowRoute
+  ProjectsProjectIdIndexRoute: typeof ProjectsProjectIdIndexRoute
+}
+
+const ProjectsProjectIdRouteChildren: ProjectsProjectIdRouteChildren = {
+  ProjectsProjectIdCommissioningRoute: ProjectsProjectIdCommissioningRoute,
+  ProjectsProjectIdDocumentsRoute: ProjectsProjectIdDocumentsRoute,
+  ProjectsProjectIdMcRoute: ProjectsProjectIdMcRoute,
+  ProjectsProjectIdPreservationRoute: ProjectsProjectIdPreservationRoute,
+  ProjectsProjectIdPunchRoute: ProjectsProjectIdPunchRoute,
+  ProjectsProjectIdSystemsRoute: ProjectsProjectIdSystemsRoute,
+  ProjectsProjectIdTurnoverRoute: ProjectsProjectIdTurnoverRoute,
+  ProjectsProjectIdWorkflowRoute: ProjectsProjectIdWorkflowRoute,
+  ProjectsProjectIdIndexRoute: ProjectsProjectIdIndexRoute,
+}
+
+const ProjectsProjectIdRouteWithChildren =
+  ProjectsProjectIdRoute._addFileChildren(ProjectsProjectIdRouteChildren)
+
+interface ProjectsRouteChildren {
+  ProjectsProjectIdRoute: typeof ProjectsProjectIdRouteWithChildren
+}
+
+const ProjectsRouteChildren: ProjectsRouteChildren = {
+  ProjectsProjectIdRoute: ProjectsProjectIdRouteWithChildren,
+}
+
+const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
+  ProjectsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProjectsRoute: ProjectsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
