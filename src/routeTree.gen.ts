@@ -39,9 +39,9 @@ const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
-  id: '/$projectId',
-  path: '/$projectId',
-  getParentRoute: () => ProjectsRoute,
+  id: '/projects/$projectId',
+  path: '/projects/$projectId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsProjectIdIndexRoute = ProjectsProjectIdIndexRouteImport.update({
   id: '/',
@@ -190,6 +190,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ProjectsProjectIdRoute: typeof ProjectsProjectIdRouteWithChildren
   ProjectsIndexRoute: typeof ProjectsIndexRoute
 }
 
@@ -218,10 +219,10 @@ declare module '@tanstack/react-router' {
     }
     '/projects/$projectId': {
       id: '/projects/$projectId'
-      path: '/$projectId'
+      path: '/projects/$projectId'
       fullPath: '/projects/$projectId'
       preLoaderRoute: typeof ProjectsProjectIdRouteImport
-      parentRoute: typeof ProjectsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/projects/$projectId/': {
       id: '/projects/$projectId/'
@@ -289,21 +290,39 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ProjectsProjectIdRouteChildren {
+  ProjectsProjectIdCommissioningRoute: typeof ProjectsProjectIdCommissioningRoute
+  ProjectsProjectIdDocumentsRoute: typeof ProjectsProjectIdDocumentsRoute
+  ProjectsProjectIdMcRoute: typeof ProjectsProjectIdMcRoute
+  ProjectsProjectIdPreservationRoute: typeof ProjectsProjectIdPreservationRoute
+  ProjectsProjectIdPunchRoute: typeof ProjectsProjectIdPunchRoute
+  ProjectsProjectIdSystemsRoute: typeof ProjectsProjectIdSystemsRoute
+  ProjectsProjectIdTurnoverRoute: typeof ProjectsProjectIdTurnoverRoute
+  ProjectsProjectIdWorkflowRoute: typeof ProjectsProjectIdWorkflowRoute
+  ProjectsProjectIdIndexRoute: typeof ProjectsProjectIdIndexRoute
+}
+
+const ProjectsProjectIdRouteChildren: ProjectsProjectIdRouteChildren = {
+  ProjectsProjectIdCommissioningRoute: ProjectsProjectIdCommissioningRoute,
+  ProjectsProjectIdDocumentsRoute: ProjectsProjectIdDocumentsRoute,
+  ProjectsProjectIdMcRoute: ProjectsProjectIdMcRoute,
+  ProjectsProjectIdPreservationRoute: ProjectsProjectIdPreservationRoute,
+  ProjectsProjectIdPunchRoute: ProjectsProjectIdPunchRoute,
+  ProjectsProjectIdSystemsRoute: ProjectsProjectIdSystemsRoute,
+  ProjectsProjectIdTurnoverRoute: ProjectsProjectIdTurnoverRoute,
+  ProjectsProjectIdWorkflowRoute: ProjectsProjectIdWorkflowRoute,
+  ProjectsProjectIdIndexRoute: ProjectsProjectIdIndexRoute,
+}
+
+const ProjectsProjectIdRouteWithChildren =
+  ProjectsProjectIdRoute._addFileChildren(ProjectsProjectIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ProjectsProjectIdRoute: ProjectsProjectIdRouteWithChildren,
   ProjectsIndexRoute: ProjectsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
