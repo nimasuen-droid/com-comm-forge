@@ -75,7 +75,7 @@ function TurnoverPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {project.systems.flatMap(sys => sys.subsystems.map(ss => {
+            {form.draft.flatMap(sys => sys.subsystems.map(ss => {
               const { pct } = turnoverProgress(ss);
               return (
                 <tr key={ss.id} className="hover:bg-muted/20">
@@ -88,7 +88,7 @@ function TurnoverPage() {
                     return (
                       <td key={k} className="px-2 py-3 text-center">
                         <button
-                          onClick={() => setCheck(project.id, sys.id, ss.id, "turnover", k, !checked)}
+                          onClick={() => setCheck(sys.id, ss.id, k, !checked)}
                           title={TURNOVER_CHECK_LABELS[k]}
                           className={cn(
                             "inline-flex h-6 w-6 items-center justify-center rounded border transition",
@@ -110,6 +110,14 @@ function TurnoverPage() {
           </tbody>
         </table>
       </div>
+
+      <SaveBar
+        moduleLabel="Turnover & Handover"
+        isDirty={form.isDirty}
+        lastSaved={form.lastSaved}
+        onSave={handleSave}
+        onDiscard={form.discard}
+      />
 
       <EngineeringInsight
         title="Why turnover is phased"
