@@ -112,24 +112,32 @@ function PunchPage() {
                   {p.dueDate && <><span>·</span><span className="text-warning">due {new Date(p.dueDate).toLocaleDateString()}</span></>}
                 </div>
               </div>
-              <select value={p.status} onChange={e => upd(project.id, p.id, { status: e.target.value as PunchStatus })}
+              <select value={p.status} onChange={e => upd(p.id, { status: e.target.value as PunchStatus })}
                 className="bg-input border border-border rounded-md px-2 py-1 text-xs">
                 <option value="open">Open</option>
                 <option value="in_progress">In progress</option>
                 <option value="closed">Closed</option>
               </select>
               {p.status === "closed" ? (
-                <button onClick={() => upd(project.id, p.id, { status: "open" })} title="Reopen" className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-muted/50"><RotateCcw className="h-3.5 w-3.5" /></button>
+                <button onClick={() => upd(p.id, { status: "open" })} title="Reopen" className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-muted/50"><RotateCcw className="h-3.5 w-3.5" /></button>
               ) : (
-                <button onClick={() => upd(project.id, p.id, { status: "closed" })} title="Close" className="h-8 w-8 rounded-md border border-success/40 text-success flex items-center justify-center hover:bg-success/10"><Check className="h-3.5 w-3.5" /></button>
+                <button onClick={() => upd(p.id, { status: "closed" })} title="Close" className="h-8 w-8 rounded-md border border-success/40 text-success flex items-center justify-center hover:bg-success/10"><Check className="h-3.5 w-3.5" /></button>
               )}
-              <button onClick={() => del(project.id, p.id)} title="Delete" className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-destructive/20 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+              <button onClick={() => del(p.id)} title="Delete" className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-destructive/20 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
             </div>
           );
         })}
       </div>
 
-      {showNew && <NewPunchDialog systems={project.systems} onClose={() => setShowNew(false)} onAdd={(d: any) => { add(project.id, d); setShowNew(false); }} />}
+      {showNew && <NewPunchDialog systems={project.systems} onClose={() => setShowNew(false)} onAdd={(d: Omit<PunchItem, "id" | "createdAt">) => { add(d); setShowNew(false); }} />}
+
+      <SaveBar
+        moduleLabel="Punch List"
+        isDirty={form.isDirty}
+        lastSaved={form.lastSaved}
+        onSave={handleSave}
+        onDiscard={form.discard}
+      />
 
       <EngineeringInsight
         title="Punch Categories & Closeout Strategy"
