@@ -2,11 +2,14 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useStore, useProject } from "@/lib/store";
 import { ragColor } from "@/lib/kpi";
 import { mcProgress, openAPunchesFor, MC_CHECK_LABELS } from "@/lib/derive";
-import { MC_CHECK_KEYS } from "@/lib/types";
+import { MC_CHECK_KEYS, type MCCheckKey } from "@/lib/types";
 import { exportMcDossier } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { SaveBar } from "@/components/SaveBar";
+import { useDirtyForm } from "@/lib/useDirtyForm";
+import { deriveMcStatus } from "@/lib/derive";
 import { FileCheck, ShieldCheck, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +20,28 @@ export const Route = createFileRoute("/projects/$projectId/mc")({
 function MCPage() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId)!;
-  const setCheck = useStore(s => s.setSubsystemCheck);
+  const replaceSystems = useStore(s => s.replaceSystems);
+  const form = useDirtyForm(project.systems);
+
+  const setCheck = (sysId: string, subId: string, key: MCCheckKey, value: boolean) => {
+    form.setDraft(systems => systems.map(sys => sys.id !== sysId ? sys : {
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ss.id !== subId ? ss : {
+        ...ss,
+        mcChecks: { ...(ss.mcChecks ?? {}), [key]: value },
+      }),
+    }));
+  };
+
+  const handleSave = () => {
+    const tempProject = { ...project, systems: form.draft };
+    const next = form.draft.map(sys => ({
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ({ ...ss, mcStatus: deriveMcStatus(tempProject, sys, ss) })),
+    }));
+    replaceSystems(project.id, next);
+    form.commit(next);
+  };
 
   return (
     <div className="space-y-5">
@@ -41,7 +65,7 @@ function MCPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {project.systems.flatMap(sys => sys.subsystems.map(ss => {
+            {form.draft.flatMap(sys => sys.subsystems.map(ss => {
               const openA = openAPunchesFor(project, sys, ss).length;
               const { pct } = mcProgress(ss, openA === 0);
               return (
@@ -58,7 +82,7 @@ function MCPage() {
                       <td key={k} className="px-2 py-3 text-center">
                         <button
                           disabled={auto}
-                          onClick={() => setCheck(project.id, sys.id, ss.id, "mc", k, !checked)}
+                          onClick={() => setCheck(sys.id, ss.id, k, !checked)}
                           title={auto ? `Auto: ${openA} open A-punches on this system` : MC_CHECK_LABELS[k]}
                           className={cn(
                             "inline-flex h-6 w-6 items-center justify-center rounded border transition",
@@ -81,17 +105,25 @@ function MCPage() {
                 </tr>
               );
             }))}
-            {project.systems.length === 0 && (
+            {form.draft.length === 0 && (
               <tr><td colSpan={9} className="p-8 text-center text-muted-foreground text-sm">Define systems and subsystems first.</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
+      <SaveBar
+        moduleLabel="Mechanical Completion"
+        isDirty={form.isDirty}
+        lastSaved={form.lastSaved}
+        onSave={handleSave}
+        onDiscard={form.discard}
+      />
+
       <EngineeringInsight
         title="Mechanical Completion — what really drives acceptance"
         defaultOpen
-        why={<>MC is the formal handover from <b>Construction</b> to <b>Commissioning</b>. Tick the six gates per subsystem; A-punch closure is automatic from the punch list.</>}
+        why={<>MC is the formal handover from <b>Construction</b> to <b>Commissioning</b>. Tick the six gates per subsystem; A-punch closure is automatic from the punch list. Changes are held in draft — click <b>Save changes</b> to commit.</>}
         problems={<>MC declared with open hydrotest packs; reinstatement done after MC; preservation logs missing; vendor scopes not closed out.</>}
         best={<>Treat each row as a hard gate. Generate the MC Dossier when all rows are green and use it to drive the MC walkdown with operations.</>}
       />
@@ -104,3 +136,4 @@ function MCPage() {
     </div>
   );
 }
+

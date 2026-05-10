@@ -4,8 +4,10 @@ import { useStore, useProject } from "@/lib/store";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { SaveBar } from "@/components/SaveBar";
+import { useDirtyForm } from "@/lib/useDirtyForm";
 import { Plus, Search, Trash2, RotateCcw, Check, Download } from "lucide-react";
-import type { Discipline, PunchCategory, PunchStatus } from "@/lib/types";
+import type { Discipline, PunchCategory, PunchItem, PunchStatus } from "@/lib/types";
 import { exportPunchRegister } from "@/lib/exports";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -18,12 +20,30 @@ const cats: PunchCategory[] = ["A","B","C"];
 const statuses: PunchStatus[] = ["open","in_progress","closed"];
 const disciplines: Discipline[] = ["Piping","Mechanical","Electrical","Instrumentation","Civil","Process","Telecom","HVAC","Fire & Gas"];
 
+const uid = () => Math.random().toString(36).slice(2, 10);
+
 function PunchPage() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId)!;
-  const add = useStore(s => s.addPunch);
-  const upd = useStore(s => s.updatePunch);
-  const del = useStore(s => s.deletePunch);
+  const replacePunches = useStore(s => s.replacePunches);
+  const form = useDirtyForm(project.punches);
+
+  const upd = (punchId: string, patch: Partial<PunchItem>) => {
+    form.setDraft(punches => punches.map(x => x.id === punchId
+      ? { ...x, ...patch, closedAt: patch.status === "closed" ? new Date().toISOString() : x.closedAt }
+      : x));
+  };
+  const del = (punchId: string) => {
+    form.setDraft(punches => punches.filter(x => x.id !== punchId));
+  };
+  const add = (data: Omit<PunchItem, "id" | "createdAt">) => {
+    const np: PunchItem = { id: uid(), createdAt: new Date().toISOString(), ...data };
+    form.setDraft(punches => [np, ...punches]);
+  };
+  const handleSave = () => {
+    replacePunches(project.id, form.draft);
+    form.commit();
+  };
 
   const [q, setQ] = useState("");
   const [fCat, setFCat] = useState<PunchCategory | "all">("all");
@@ -31,17 +51,17 @@ function PunchPage() {
   const [fDisc, setFDisc] = useState<Discipline | "all">("all");
   const [showNew, setShowNew] = useState(false);
 
-  const filtered = useMemo(() => project.punches.filter(p =>
+  const filtered = useMemo(() => form.draft.filter(p =>
     (fCat === "all" || p.category === fCat) &&
     (fStat === "all" || p.status === fStat) &&
     (fDisc === "all" || p.discipline === fDisc) &&
     (q === "" || p.title.toLowerCase().includes(q.toLowerCase()))
-  ), [project.punches, q, fCat, fStat, fDisc]);
+  ), [form.draft, q, fCat, fStat, fDisc]);
 
   const stats = {
-    A: { open: project.punches.filter(p => p.category === "A" && p.status !== "closed").length, total: project.punches.filter(p => p.category === "A").length },
-    B: { open: project.punches.filter(p => p.category === "B" && p.status !== "closed").length, total: project.punches.filter(p => p.category === "B").length },
-    C: { open: project.punches.filter(p => p.category === "C" && p.status !== "closed").length, total: project.punches.filter(p => p.category === "C").length },
+    A: { open: form.draft.filter(p => p.category === "A" && p.status !== "closed").length, total: form.draft.filter(p => p.category === "A").length },
+    B: { open: form.draft.filter(p => p.category === "B" && p.status !== "closed").length, total: form.draft.filter(p => p.category === "B").length },
+    C: { open: form.draft.filter(p => p.category === "C" && p.status !== "closed").length, total: form.draft.filter(p => p.category === "C").length },
   };
 
   return (
@@ -92,24 +112,32 @@ function PunchPage() {
                   {p.dueDate && <><span>·</span><span className="text-warning">due {new Date(p.dueDate).toLocaleDateString()}</span></>}
                 </div>
               </div>
-              <select value={p.status} onChange={e => upd(project.id, p.id, { status: e.target.value as PunchStatus })}
+              <select value={p.status} onChange={e => upd(p.id, { status: e.target.value as PunchStatus })}
                 className="bg-input border border-border rounded-md px-2 py-1 text-xs">
                 <option value="open">Open</option>
                 <option value="in_progress">In progress</option>
                 <option value="closed">Closed</option>
               </select>
               {p.status === "closed" ? (
-                <button onClick={() => upd(project.id, p.id, { status: "open" })} title="Reopen" className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-muted/50"><RotateCcw className="h-3.5 w-3.5" /></button>
+                <button onClick={() => upd(p.id, { status: "open" })} title="Reopen" className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-muted/50"><RotateCcw className="h-3.5 w-3.5" /></button>
               ) : (
-                <button onClick={() => upd(project.id, p.id, { status: "closed" })} title="Close" className="h-8 w-8 rounded-md border border-success/40 text-success flex items-center justify-center hover:bg-success/10"><Check className="h-3.5 w-3.5" /></button>
+                <button onClick={() => upd(p.id, { status: "closed" })} title="Close" className="h-8 w-8 rounded-md border border-success/40 text-success flex items-center justify-center hover:bg-success/10"><Check className="h-3.5 w-3.5" /></button>
               )}
-              <button onClick={() => del(project.id, p.id)} title="Delete" className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-destructive/20 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
+              <button onClick={() => del(p.id)} title="Delete" className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-destructive/20 hover:text-destructive"><Trash2 className="h-3.5 w-3.5" /></button>
             </div>
           );
         })}
       </div>
 
-      {showNew && <NewPunchDialog systems={project.systems} onClose={() => setShowNew(false)} onAdd={(d: any) => { add(project.id, d); setShowNew(false); }} />}
+      {showNew && <NewPunchDialog systems={project.systems} onClose={() => setShowNew(false)} onAdd={(d: Omit<PunchItem, "id" | "createdAt">) => { add(d); setShowNew(false); }} />}
+
+      <SaveBar
+        moduleLabel="Punch List"
+        isDirty={form.isDirty}
+        lastSaved={form.lastSaved}
+        onSave={handleSave}
+        onDiscard={form.discard}
+      />
 
       <EngineeringInsight
         title="Punch Categories & Closeout Strategy"

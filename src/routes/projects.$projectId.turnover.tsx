@@ -1,12 +1,14 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useProject, useStore } from "@/lib/store";
 import { ragColor } from "@/lib/kpi";
-import { turnoverProgress, TURNOVER_CHECK_LABELS } from "@/lib/derive";
-import { TURNOVER_CHECK_KEYS } from "@/lib/types";
+import { turnoverProgress, TURNOVER_CHECK_LABELS, deriveTurnoverStatus } from "@/lib/derive";
+import { TURNOVER_CHECK_KEYS, type TurnoverCheckKey } from "@/lib/types";
 import { exportHandoverDossier } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { SaveBar } from "@/components/SaveBar";
+import { useDirtyForm } from "@/lib/useDirtyForm";
 import { PackageCheck, FileCheck2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +19,28 @@ export const Route = createFileRoute("/projects/$projectId/turnover")({
 function TurnoverPage() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId)!;
-  const setCheck = useStore(s => s.setSubsystemCheck);
+  const replaceSystems = useStore(s => s.replaceSystems);
+  const form = useDirtyForm(project.systems);
+
+  const setCheck = (sysId: string, subId: string, key: TurnoverCheckKey, value: boolean) => {
+    form.setDraft(systems => systems.map(sys => sys.id !== sysId ? sys : {
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ss.id !== subId ? ss : {
+        ...ss,
+        turnoverChecks: { ...(ss.turnoverChecks ?? {}), [key]: value },
+      }),
+    }));
+  };
+
+  const handleSave = () => {
+    const tempProject = { ...project, systems: form.draft };
+    const next = form.draft.map(sys => ({
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ({ ...ss, turnoverStatus: deriveTurnoverStatus(tempProject, sys, ss) })),
+    }));
+    replaceSystems(project.id, next);
+    form.commit(next);
+  };
 
   return (
     <div className="space-y-5">
@@ -52,7 +75,7 @@ function TurnoverPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {project.systems.flatMap(sys => sys.subsystems.map(ss => {
+            {form.draft.flatMap(sys => sys.subsystems.map(ss => {
               const { pct } = turnoverProgress(ss);
               return (
                 <tr key={ss.id} className="hover:bg-muted/20">
@@ -65,7 +88,7 @@ function TurnoverPage() {
                     return (
                       <td key={k} className="px-2 py-3 text-center">
                         <button
-                          onClick={() => setCheck(project.id, sys.id, ss.id, "turnover", k, !checked)}
+                          onClick={() => setCheck(sys.id, ss.id, k, !checked)}
                           title={TURNOVER_CHECK_LABELS[k]}
                           className={cn(
                             "inline-flex h-6 w-6 items-center justify-center rounded border transition",
@@ -87,6 +110,14 @@ function TurnoverPage() {
           </tbody>
         </table>
       </div>
+
+      <SaveBar
+        moduleLabel="Turnover & Handover"
+        isDirty={form.isDirty}
+        lastSaved={form.lastSaved}
+        onSave={handleSave}
+        onDiscard={form.discard}
+      />
 
       <EngineeringInsight
         title="Why turnover is phased"

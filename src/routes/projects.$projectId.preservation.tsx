@@ -4,6 +4,8 @@ import { exportPreservation } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { SaveBar } from "@/components/SaveBar";
+import { useDirtyForm } from "@/lib/useDirtyForm";
 import { Wrench, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,9 +16,25 @@ export const Route = createFileRoute("/projects/$projectId/preservation")({
 function PresPage() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId)!;
-  const update = useStore(s => s.updateSubsystem);
+  const replaceSystems = useStore(s => s.replaceSystems);
+  const form = useDirtyForm(project.systems);
 
-  const items = project.systems.flatMap(sys => sys.subsystems.map(ss => ({ sys, ss })));
+  const updateSub = (sysId: string, subId: string, patch: { interval?: number; lastDone?: string | undefined }) => {
+    form.setDraft(systems => systems.map(sys => sys.id !== sysId ? sys : {
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ss.id !== subId ? ss : {
+        ...ss,
+        preservation: { ...(ss.preservation ?? { interval: 0 }), ...patch },
+      }),
+    }));
+  };
+
+  const handleSave = () => {
+    replaceSystems(project.id, form.draft);
+    form.commit();
+  };
+
+  const items = form.draft.flatMap(sys => sys.subsystems.map(ss => ({ sys, ss })));
 
   return (
     <div className="space-y-5">
@@ -54,11 +72,11 @@ function PresPage() {
                   </td>
                   <td className="px-2 py-3 text-xs text-muted-foreground">{ss.discipline}</td>
                   <td className="px-2 py-3">
-                    <input type="number" value={interval} onChange={e => update(project.id, sys.id, ss.id, { preservation: { ...ss.preservation, interval: Number(e.target.value) } })}
+                    <input type="number" value={interval} onChange={e => updateSub(sys.id, ss.id, { interval: Number(e.target.value) })}
                       className="w-20 bg-input border border-border rounded px-2 py-1 text-xs" />
                   </td>
                   <td className="px-2 py-3 text-xs">
-                    <input type="date" value={ss.preservation?.lastDone?.slice(0,10) ?? ""} onChange={e => update(project.id, sys.id, ss.id, { preservation: { ...ss.preservation, interval, lastDone: e.target.value ? new Date(e.target.value).toISOString() : undefined } })}
+                    <input type="date" value={ss.preservation?.lastDone?.slice(0,10) ?? ""} onChange={e => updateSub(sys.id, ss.id, { interval, lastDone: e.target.value ? new Date(e.target.value).toISOString() : undefined })}
                       className="bg-input border border-border rounded px-2 py-1 text-xs" />
                   </td>
                   <td className={cn("px-2 py-3 text-xs", overdue && "text-destructive font-bold")}>
@@ -75,6 +93,14 @@ function PresPage() {
           </tbody>
         </table>
       </div>
+
+      <SaveBar
+        moduleLabel="Preservation Register"
+        isDirty={form.isDirty}
+        lastSaved={form.lastSaved}
+        onSave={handleSave}
+        onDiscard={form.discard}
+      />
 
       <EngineeringInsight
         title="Preservation — silent killer of commissioning schedules"
