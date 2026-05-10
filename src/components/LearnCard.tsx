@@ -125,7 +125,45 @@ function Block({ icon, label, children, tone }: { icon: ReactNode; label: string
         {icon}
         <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">{label}</div>
       </div>
-      <div className="text-sm text-foreground/90 leading-relaxed">{children}</div>
+      <div className="text-sm text-foreground/90 leading-relaxed">
+        <AbbrText>{children}</AbbrText>
+      </div>
+    </div>
+  );
+}
+
+function GlossaryModal({ onClose }: { onClose: () => void }) {
+  const entries = Object.entries(ABBREVIATIONS).sort(([a], [b]) => a.localeCompare(b));
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-background/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"
+      onClick={onClose}
+    >
+      <div className="panel max-w-3xl w-full max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="sticky top-0 flex items-start gap-3 p-5 border-b border-border bg-card/95 backdrop-blur">
+          <div className="h-10 w-10 rounded-md bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
+            <Library className="h-5 w-5 text-accent" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-accent">Reference</div>
+            <h3 className="text-lg font-bold leading-tight">Completions & Commissioning Glossary</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Hover any underlined term anywhere in the app to see its meaning.</p>
+          </div>
+          <button onClick={onClose} className="h-8 w-8 rounded-md hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-5">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+            {entries.map(([term, meaning]) => (
+              <div key={term} className="flex gap-3 py-1.5 border-b border-border/40">
+                <dt className="font-mono text-xs font-bold text-accent shrink-0 w-16">{term}</dt>
+                <dd className="text-xs text-foreground/85 leading-relaxed">{meaning}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
     </div>
   );
 }
