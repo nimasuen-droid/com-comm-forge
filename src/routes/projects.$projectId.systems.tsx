@@ -73,7 +73,10 @@ function SystemsPage() {
         {project.systems.length === 0 && (
           <div className="p-8 text-center text-muted-foreground text-sm">No systems defined. Create your first system to start subsystem breakdown.</div>
         )}
-        {project.systems.map(sys => (
+        {form.draft.length === 0 && (
+          <div className="p-8 text-center text-muted-foreground text-sm">No systems defined. Create your first system to start subsystem breakdown.</div>
+        )}
+        {form.draft.map(sys => (
           <div key={sys.id}>
             <div className="flex items-center gap-3 p-4 hover:bg-muted/20">
               <button onClick={() => setOpen(o => ({ ...o, [sys.id]: !o[sys.id] }))} className="text-muted-foreground">
@@ -89,7 +92,7 @@ function SystemsPage() {
                 {sys.description && <div className="text-xs text-muted-foreground mt-0.5">{sys.description}</div>}
               </div>
               <span className="text-xs text-muted-foreground font-mono">{sys.subsystems.length} subsystems</span>
-              <button onClick={() => confirm("Delete system and all its subsystems?") && deleteSystem(project.id, sys.id)} className="text-muted-foreground hover:text-destructive p-1">
+              <button onClick={() => { if (confirm("Delete system and all its subsystems? (Save to commit)")) deleteSystem(sys.id); }} className="text-muted-foreground hover:text-destructive p-1">
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -116,27 +119,35 @@ function SystemsPage() {
                     <div className="col-span-2 text-xs text-muted-foreground">{ss.discipline}</div>
                     {(["mcStatus","rfsuStatus","commStatus","turnoverStatus"] as const).map(k => (
                       <div key={k} className="col-span-1 flex justify-center">
-                        <select value={ss[k]} onChange={e => updateSubsystem(project.id, sys.id, ss.id, { [k]: e.target.value as RAG })}
+                        <select value={ss[k]} onChange={e => updateSubsystem(sys.id, ss.id, { [k]: e.target.value as RAG })}
                           className="bg-transparent border border-border rounded px-1 py-0.5 text-xs">
                           {rags.map(r => <option key={r} value={r}>{r}</option>)}
                         </select>
                       </div>
                     ))}
                     <div className="col-span-1 flex justify-end">
-                      <button onClick={() => deleteSubsystem(project.id, sys.id, ss.id)} className="text-muted-foreground hover:text-destructive p-1">
+                      <button onClick={() => deleteSubsystem(sys.id, ss.id)} className="text-muted-foreground hover:text-destructive p-1">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </div>
                   </div>
                 ))}
-                <AddSubsystemRow onAdd={(d) => addSubsystem(project.id, sys.id, d)} />
+                <AddSubsystemRow onAdd={(d) => addSubsystem(sys.id, d)} />
               </div>
             )}
           </div>
         ))}
       </div>
 
-      {showNewSys && <NewSystemDialog onClose={() => setShowNewSys(false)} onAdd={(d) => { addSystem(project.id, d); setShowNewSys(false); }} />}
+      {showNewSys && <NewSystemDialog onClose={() => setShowNewSys(false)} onAdd={(d) => { addSystem(d); setShowNewSys(false); }} />}
+
+      <SaveBar
+        moduleLabel="Systemization"
+        isDirty={form.isDirty}
+        lastSaved={form.lastSaved}
+        onSave={handleSave}
+        onDiscard={form.discard}
+      />
 
       <EngineeringInsight
         title="Systemization & Subsystem Breakdown"
