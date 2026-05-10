@@ -67,31 +67,33 @@ export function SaveBar({ isDirty, lastSaved, onSave, onDiscard, moduleLabel = "
     <>
       <div
         className={cn(
-          "sticky bottom-3 z-30 mt-4 flex items-center gap-3 rounded-lg border px-4 py-2.5 shadow-lg backdrop-blur transition-colors",
+          "sticky bottom-3 z-30 mt-4 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 shadow-lg backdrop-blur transition-colors sm:gap-3 sm:px-4 sm:py-2.5",
           isDirty
-            ? "border-warning/50 bg-warning/10"
+            ? "border-warning/50 bg-warning/95 text-warning-foreground"
             : "border-border bg-card/95"
         )}
         role="region"
         aria-label="Form save status"
       >
         <StatusPill isDirty={isDirty} lastSaved={lastSaved} tick={tick} />
-        <div className="flex-1" />
-        <button
-          onClick={onDiscard}
-          disabled={!isDirty || saving}
-          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          <RotateCcw className="h-3.5 w-3.5" /> Discard
-        </button>
-        <button
-          onClick={doSave}
-          disabled={!isDirty || saving}
-          className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-          {saving ? "Saving…" : "Save changes"}
-        </button>
+        <div className="flex-1 min-w-0" />
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={onDiscard}
+            disabled={!isDirty || saving}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Discard</span>
+          </button>
+          <button
+            onClick={doSave}
+            disabled={!isDirty || saving}
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed sm:px-4"
+          >
+            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+            {saving ? "Saving…" : "Save"}
+          </button>
+        </div>
       </div>
 
       {blocker.status === "blocked" && (
@@ -113,21 +115,21 @@ export function SaveBar({ isDirty, lastSaved, onSave, onDiscard, moduleLabel = "
 }
 
 function StatusPill({ isDirty, lastSaved, tick }: { isDirty: boolean; lastSaved: Date | null; tick: number }) {
-  // tick forces re-render so "Saved Xs ago" advances
   void tick;
   if (isDirty) {
     return (
-      <span className="inline-flex items-center gap-1.5 text-xs font-medium text-warning">
+      <span className="inline-flex items-center gap-1.5 text-xs font-semibold">
         <AlertCircle className="h-3.5 w-3.5" />
         Unsaved changes
       </span>
     );
   }
+  const savedTxt = formatSavedAt(lastSaved);
   return (
     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success">
       <Check className="h-3.5 w-3.5" />
       All changes saved
-      <span className="text-muted-foreground font-normal">· {formatSavedAt(lastSaved)}</span>
+      {savedTxt && <span className="hidden sm:inline text-muted-foreground font-normal">· {savedTxt}</span>}
     </span>
   );
 }

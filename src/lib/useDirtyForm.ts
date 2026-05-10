@@ -60,9 +60,9 @@ export function useDirtyForm<T>(initial: T) {
   return { draft, setDraft, baseline, isDirty, lastSaved, markSaved, discard, reset, commit };
 }
 
-/** Format a saved-at timestamp for the SaveBar status pill. */
+/** Format a saved-at timestamp for the SaveBar status pill. Returns empty string when never saved. */
 export function formatSavedAt(d: Date | null): string {
-  if (!d) return "Not saved yet";
+  if (!d) return "";
   const diffSec = Math.max(0, (Date.now() - d.getTime()) / 1000);
   if (diffSec < 5) return "Saved just now";
   if (diffSec < 60) return `Saved ${Math.floor(diffSec)}s ago`;
