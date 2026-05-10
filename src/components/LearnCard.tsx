@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
-import { GraduationCap, X, BookOpen, Cog, Package, Target, AlertTriangle, FileText } from "lucide-react";
+import { GraduationCap, X, BookOpen, Cog, Package, Target, AlertTriangle, FileText, Library } from "lucide-react";
 import { LEARN, type ModuleKey, type LearnConcept } from "@/lib/learn";
+import { ABBREVIATIONS } from "@/lib/abbreviations";
+import { AbbrText } from "@/components/AbbrText";
 import { cn } from "@/lib/utils";
 
 /**
