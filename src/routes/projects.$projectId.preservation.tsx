@@ -72,11 +72,11 @@ function PresPage() {
                   </td>
                   <td className="px-2 py-3 text-xs text-muted-foreground">{ss.discipline}</td>
                   <td className="px-2 py-3">
-                    <input type="number" value={interval} onChange={e => update(project.id, sys.id, ss.id, { preservation: { ...ss.preservation, interval: Number(e.target.value) } })}
+                    <input type="number" value={interval} onChange={e => updateSub(sys.id, ss.id, { interval: Number(e.target.value) })}
                       className="w-20 bg-input border border-border rounded px-2 py-1 text-xs" />
                   </td>
                   <td className="px-2 py-3 text-xs">
-                    <input type="date" value={ss.preservation?.lastDone?.slice(0,10) ?? ""} onChange={e => update(project.id, sys.id, ss.id, { preservation: { ...ss.preservation, interval, lastDone: e.target.value ? new Date(e.target.value).toISOString() : undefined } })}
+                    <input type="date" value={ss.preservation?.lastDone?.slice(0,10) ?? ""} onChange={e => updateSub(sys.id, ss.id, { interval, lastDone: e.target.value ? new Date(e.target.value).toISOString() : undefined })}
                       className="bg-input border border-border rounded px-2 py-1 text-xs" />
                   </td>
                   <td className={cn("px-2 py-3 text-xs", overdue && "text-destructive font-bold")}>
@@ -93,6 +93,14 @@ function PresPage() {
           </tbody>
         </table>
       </div>
+
+      <SaveBar
+        moduleLabel="Preservation Register"
+        isDirty={form.isDirty}
+        lastSaved={form.lastSaved}
+        onSave={handleSave}
+        onDiscard={form.discard}
+      />
 
       <EngineeringInsight
         title="Preservation — silent killer of commissioning schedules"
