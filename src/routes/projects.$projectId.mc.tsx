@@ -2,11 +2,14 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useStore, useProject } from "@/lib/store";
 import { ragColor } from "@/lib/kpi";
 import { mcProgress, openAPunchesFor, MC_CHECK_LABELS } from "@/lib/derive";
-import { MC_CHECK_KEYS } from "@/lib/types";
+import { MC_CHECK_KEYS, type MCCheckKey } from "@/lib/types";
 import { exportMcDossier } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { SaveBar } from "@/components/SaveBar";
+import { useDirtyForm } from "@/lib/useDirtyForm";
+import { deriveMcStatus } from "@/lib/derive";
 import { FileCheck, ShieldCheck, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +20,28 @@ export const Route = createFileRoute("/projects/$projectId/mc")({
 function MCPage() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId)!;
-  const setCheck = useStore(s => s.setSubsystemCheck);
+  const replaceSystems = useStore(s => s.replaceSystems);
+  const form = useDirtyForm(project.systems);
+
+  const setCheck = (sysId: string, subId: string, key: MCCheckKey, value: boolean) => {
+    form.setDraft(systems => systems.map(sys => sys.id !== sysId ? sys : {
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ss.id !== subId ? ss : {
+        ...ss,
+        mcChecks: { ...(ss.mcChecks ?? {}), [key]: value },
+      }),
+    }));
+  };
+
+  const handleSave = () => {
+    const tempProject = { ...project, systems: form.draft };
+    const next = form.draft.map(sys => ({
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ({ ...ss, mcStatus: deriveMcStatus(tempProject, sys, ss) })),
+    }));
+    replaceSystems(project.id, next);
+    form.commit(next);
+  };
 
   return (
     <div className="space-y-5">
