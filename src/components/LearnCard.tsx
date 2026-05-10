@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
-import { GraduationCap, X, BookOpen, Cog, Package, Target, AlertTriangle, FileText } from "lucide-react";
+import { GraduationCap, X, BookOpen, Cog, Package, Target, AlertTriangle, FileText, Library } from "lucide-react";
 import { LEARN, type ModuleKey, type LearnConcept } from "@/lib/learn";
+import { ABBREVIATIONS } from "@/lib/abbreviations";
+import { AbbrText } from "@/components/AbbrText";
 import { cn } from "@/lib/utils";
 
 /**
@@ -12,6 +14,7 @@ import { cn } from "@/lib/utils";
  */
 export function LearnRail({ module, title = "Build competency" }: { module: ModuleKey; title?: string }) {
   const [active, setActive] = useState<LearnConcept | null>(null);
+  const [glossary, setGlossary] = useState(false);
   const concepts = LEARN[module] ?? [];
 
   return (
@@ -22,8 +25,16 @@ export function LearnRail({ module, title = "Build competency" }: { module: Modu
         </div>
         <div className="flex-1">
           <div className="text-sm font-semibold leading-tight">{title}</div>
-          <div className="text-[11px] text-muted-foreground">Tap a topic — Why · How · What · Drivers</div>
+          <div className="text-[11px] text-muted-foreground">Tap a topic — Why · How · What · Drivers. Hover any abbreviation for its meaning.</div>
         </div>
+        <button
+          onClick={() => setGlossary(true)}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium hover:bg-accent/10 hover:border-accent/50 transition-colors"
+          title="Open glossary of abbreviations"
+        >
+          <Library className="h-3.5 w-3.5 text-accent" />
+          Glossary
+        </button>
       </div>
       <div className="flex flex-wrap gap-2">
         {concepts.map(c => (
@@ -40,6 +51,7 @@ export function LearnRail({ module, title = "Build competency" }: { module: Modu
       </div>
 
       {active && <LearnModal concept={active} onClose={() => setActive(null)} />}
+      {glossary && <GlossaryModal onClose={() => setGlossary(false)} />}
     </div>
   );
 }
@@ -113,7 +125,45 @@ function Block({ icon, label, children, tone }: { icon: ReactNode; label: string
         {icon}
         <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">{label}</div>
       </div>
-      <div className="text-sm text-foreground/90 leading-relaxed">{children}</div>
+      <div className="text-sm text-foreground/90 leading-relaxed">
+        <AbbrText>{children}</AbbrText>
+      </div>
+    </div>
+  );
+}
+
+function GlossaryModal({ onClose }: { onClose: () => void }) {
+  const entries = Object.entries(ABBREVIATIONS).sort(([a], [b]) => a.localeCompare(b));
+  return (
+    <div
+      className="fixed inset-0 z-50 bg-background/85 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"
+      onClick={onClose}
+    >
+      <div className="panel max-w-3xl w-full max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="sticky top-0 flex items-start gap-3 p-5 border-b border-border bg-card/95 backdrop-blur">
+          <div className="h-10 w-10 rounded-md bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
+            <Library className="h-5 w-5 text-accent" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-accent">Reference</div>
+            <h3 className="text-lg font-bold leading-tight">Completions & Commissioning Glossary</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Hover any underlined term anywhere in the app to see its meaning.</p>
+          </div>
+          <button onClick={onClose} className="h-8 w-8 rounded-md hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-5">
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+            {entries.map(([term, meaning]) => (
+              <div key={term} className="flex gap-3 py-1.5 border-b border-border/40">
+                <dt className="font-mono text-xs font-bold text-accent shrink-0 w-16">{term}</dt>
+                <dd className="text-xs text-foreground/85 leading-relaxed">{meaning}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
     </div>
   );
 }
