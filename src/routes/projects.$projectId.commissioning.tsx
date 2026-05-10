@@ -121,6 +121,14 @@ function CommPage() {
         </table>
       </div>
 
+      <SaveBar
+        moduleLabel="Commissioning"
+        isDirty={form.isDirty}
+        lastSaved={form.lastSaved}
+        onSave={handleSave}
+        onDiscard={form.discard}
+      />
+
       <EngineeringInsight
         title="Why commissioning sequence matters"
         defaultOpen
