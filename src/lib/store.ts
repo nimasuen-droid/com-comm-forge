@@ -90,9 +90,12 @@ interface State {
   deleteSubsystem: (projectId: string, sysId: string, subId: string) => void;
   setSubsystemCheck: (projectId: string, sysId: string, subId: string, area: "mc" | "comm" | "turnover", key: string, value: boolean) => void;
 
+  replaceSystems: (projectId: string, systems: SystemNode[]) => void;
+
   addPunch: (projectId: string, p: Omit<PunchItem, "id" | "createdAt">) => void;
   updatePunch: (projectId: string, punchId: string, patch: Partial<PunchItem>) => void;
   deletePunch: (projectId: string, punchId: string) => void;
+  replacePunches: (projectId: string, punches: PunchItem[]) => void;
 
   addDocument: (projectId: string, d: Omit<DocumentItem, "id" | "uploadedAt">) => void;
   deleteDocument: (projectId: string, docId: string) => void;
