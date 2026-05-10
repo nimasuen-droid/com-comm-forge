@@ -4,8 +4,10 @@ import { useStore, useProject } from "@/lib/store";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { SaveBar } from "@/components/SaveBar";
+import { useDirtyForm } from "@/lib/useDirtyForm";
 import { Plus, Search, Trash2, RotateCcw, Check, Download } from "lucide-react";
-import type { Discipline, PunchCategory, PunchStatus } from "@/lib/types";
+import type { Discipline, PunchCategory, PunchItem, PunchStatus } from "@/lib/types";
 import { exportPunchRegister } from "@/lib/exports";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -18,12 +20,30 @@ const cats: PunchCategory[] = ["A","B","C"];
 const statuses: PunchStatus[] = ["open","in_progress","closed"];
 const disciplines: Discipline[] = ["Piping","Mechanical","Electrical","Instrumentation","Civil","Process","Telecom","HVAC","Fire & Gas"];
 
+const uid = () => Math.random().toString(36).slice(2, 10);
+
 function PunchPage() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId)!;
-  const add = useStore(s => s.addPunch);
-  const upd = useStore(s => s.updatePunch);
-  const del = useStore(s => s.deletePunch);
+  const replacePunches = useStore(s => s.replacePunches);
+  const form = useDirtyForm(project.punches);
+
+  const upd = (punchId: string, patch: Partial<PunchItem>) => {
+    form.setDraft(punches => punches.map(x => x.id === punchId
+      ? { ...x, ...patch, closedAt: patch.status === "closed" ? new Date().toISOString() : x.closedAt }
+      : x));
+  };
+  const del = (punchId: string) => {
+    form.setDraft(punches => punches.filter(x => x.id !== punchId));
+  };
+  const add = (data: Omit<PunchItem, "id" | "createdAt">) => {
+    const np: PunchItem = { id: uid(), createdAt: new Date().toISOString(), ...data };
+    form.setDraft(punches => [np, ...punches]);
+  };
+  const handleSave = () => {
+    replacePunches(project.id, form.draft);
+    form.commit();
+  };
 
   const [q, setQ] = useState("");
   const [fCat, setFCat] = useState<PunchCategory | "all">("all");
@@ -31,17 +51,17 @@ function PunchPage() {
   const [fDisc, setFDisc] = useState<Discipline | "all">("all");
   const [showNew, setShowNew] = useState(false);
 
-  const filtered = useMemo(() => project.punches.filter(p =>
+  const filtered = useMemo(() => form.draft.filter(p =>
     (fCat === "all" || p.category === fCat) &&
     (fStat === "all" || p.status === fStat) &&
     (fDisc === "all" || p.discipline === fDisc) &&
     (q === "" || p.title.toLowerCase().includes(q.toLowerCase()))
-  ), [project.punches, q, fCat, fStat, fDisc]);
+  ), [form.draft, q, fCat, fStat, fDisc]);
 
   const stats = {
-    A: { open: project.punches.filter(p => p.category === "A" && p.status !== "closed").length, total: project.punches.filter(p => p.category === "A").length },
-    B: { open: project.punches.filter(p => p.category === "B" && p.status !== "closed").length, total: project.punches.filter(p => p.category === "B").length },
-    C: { open: project.punches.filter(p => p.category === "C" && p.status !== "closed").length, total: project.punches.filter(p => p.category === "C").length },
+    A: { open: form.draft.filter(p => p.category === "A" && p.status !== "closed").length, total: form.draft.filter(p => p.category === "A").length },
+    B: { open: form.draft.filter(p => p.category === "B" && p.status !== "closed").length, total: form.draft.filter(p => p.category === "B").length },
+    C: { open: form.draft.filter(p => p.category === "C" && p.status !== "closed").length, total: form.draft.filter(p => p.category === "C").length },
   };
 
   return (
