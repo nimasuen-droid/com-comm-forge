@@ -1,11 +1,13 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useProject, useStore } from "@/lib/store";
 import { ragColor } from "@/lib/kpi";
-import { commProgress, COMM_CHECK_LABELS } from "@/lib/derive";
-import { COMM_CHECK_KEYS } from "@/lib/types";
+import { commProgress, COMM_CHECK_LABELS, deriveCommStatus } from "@/lib/derive";
+import { COMM_CHECK_KEYS, type CommCheckKey } from "@/lib/types";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { SaveBar } from "@/components/SaveBar";
+import { useDirtyForm } from "@/lib/useDirtyForm";
 import { Activity, Zap, Cpu, Flame, Wind, Droplets, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +27,28 @@ const STAGE_META = {
 function CommPage() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId)!;
-  const setCheck = useStore(s => s.setSubsystemCheck);
+  const replaceSystems = useStore(s => s.replaceSystems);
+  const form = useDirtyForm(project.systems);
+
+  const setCheck = (sysId: string, subId: string, key: CommCheckKey, value: boolean) => {
+    form.setDraft(systems => systems.map(sys => sys.id !== sysId ? sys : {
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ss.id !== subId ? ss : {
+        ...ss,
+        commChecks: { ...(ss.commChecks ?? {}), [key]: value },
+      }),
+    }));
+  };
+
+  const handleSave = () => {
+    const tempProject = { ...project, systems: form.draft };
+    const next = form.draft.map(sys => ({
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ({ ...ss, commStatus: deriveCommStatus(tempProject, sys, ss) })),
+    }));
+    replaceSystems(project.id, next);
+    form.commit(next);
+  };
 
   return (
     <div className="space-y-5">
