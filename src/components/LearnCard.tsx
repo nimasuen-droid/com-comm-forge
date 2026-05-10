@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
  */
 export function LearnRail({ module, title = "Build competency" }: { module: ModuleKey; title?: string }) {
   const [active, setActive] = useState<LearnConcept | null>(null);
+  const [glossary, setGlossary] = useState(false);
   const concepts = LEARN[module] ?? [];
 
   return (
@@ -24,8 +25,16 @@ export function LearnRail({ module, title = "Build competency" }: { module: Modu
         </div>
         <div className="flex-1">
           <div className="text-sm font-semibold leading-tight">{title}</div>
-          <div className="text-[11px] text-muted-foreground">Tap a topic — Why · How · What · Drivers</div>
+          <div className="text-[11px] text-muted-foreground">Tap a topic — Why · How · What · Drivers. Hover any abbreviation for its meaning.</div>
         </div>
+        <button
+          onClick={() => setGlossary(true)}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-xs font-medium hover:bg-accent/10 hover:border-accent/50 transition-colors"
+          title="Open glossary of abbreviations"
+        >
+          <Library className="h-3.5 w-3.5 text-accent" />
+          Glossary
+        </button>
       </div>
       <div className="flex flex-wrap gap-2">
         {concepts.map(c => (
@@ -42,6 +51,7 @@ export function LearnRail({ module, title = "Build competency" }: { module: Modu
       </div>
 
       {active && <LearnModal concept={active} onClose={() => setActive(null)} />}
+      {glossary && <GlossaryModal onClose={() => setGlossary(false)} />}
     </div>
   );
 }
