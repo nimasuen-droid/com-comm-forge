@@ -157,6 +157,10 @@ export const useStore = create<State>()(
         set({ projects: get().projects.map(p => p.id !== projectId ? p : { ...p, systems: p.systems.map(s => s.id !== sysId ? s : { ...s, subsystems: s.subsystems.map(ss => ss.id === subId ? { ...ss, ...patch } : ss) }) }) }),
       deleteSubsystem: (projectId, sysId, subId) =>
         set({ projects: get().projects.map(p => p.id !== projectId ? p : { ...p, systems: p.systems.map(s => s.id !== sysId ? s : { ...s, subsystems: s.subsystems.filter(ss => ss.id !== subId) }) }) }),
+      replaceSystems: (projectId, systems) =>
+        set({ projects: get().projects.map(p => p.id !== projectId ? p : { ...p, systems, updatedAt: new Date().toISOString() }) }),
+      replacePunches: (projectId, punches) =>
+        set({ projects: get().projects.map(p => p.id !== projectId ? p : { ...p, punches, updatedAt: new Date().toISOString() }) }),
 
       setSubsystemCheck: (projectId, sysId, subId, area, key, value) => {
         set({ projects: get().projects.map(p => {
