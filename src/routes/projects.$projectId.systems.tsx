@@ -70,9 +70,6 @@ function SystemsPage() {
       </div>
 
       <div className="panel divide-y divide-border">
-        {project.systems.length === 0 && (
-          <div className="p-8 text-center text-muted-foreground text-sm">No systems defined. Create your first system to start subsystem breakdown.</div>
-        )}
         {form.draft.length === 0 && (
           <div className="p-8 text-center text-muted-foreground text-sm">No systems defined. Create your first system to start subsystem breakdown.</div>
         )}
