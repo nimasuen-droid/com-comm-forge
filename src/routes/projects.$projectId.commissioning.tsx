@@ -83,7 +83,7 @@ function CommPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {project.systems.flatMap(sys => sys.subsystems.map(ss => {
+            {form.draft.flatMap(sys => sys.subsystems.map(ss => {
               const { pct } = commProgress(ss);
               const mcDone = (ss.mcChecks?.walkdown && ss.mcChecks?.hydrotest && ss.mcChecks?.flushing && ss.mcChecks?.reinstatement);
               return (
@@ -98,7 +98,7 @@ function CommPage() {
                     return (
                       <td key={k} className="px-2 py-3 text-center">
                         <button
-                          onClick={() => setCheck(project.id, sys.id, ss.id, "comm", k, !checked)}
+                          onClick={() => setCheck(sys.id, ss.id, k, !checked)}
                           title={COMM_CHECK_LABELS[k]}
                           className={cn(
                             "inline-flex h-6 w-6 items-center justify-center rounded border transition",
