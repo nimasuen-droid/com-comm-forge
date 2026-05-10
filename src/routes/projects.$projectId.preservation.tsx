@@ -4,6 +4,8 @@ import { exportPreservation } from "@/lib/exports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { SaveBar } from "@/components/SaveBar";
+import { useDirtyForm } from "@/lib/useDirtyForm";
 import { Wrench, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,9 +16,25 @@ export const Route = createFileRoute("/projects/$projectId/preservation")({
 function PresPage() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId)!;
-  const update = useStore(s => s.updateSubsystem);
+  const replaceSystems = useStore(s => s.replaceSystems);
+  const form = useDirtyForm(project.systems);
 
-  const items = project.systems.flatMap(sys => sys.subsystems.map(ss => ({ sys, ss })));
+  const updateSub = (sysId: string, subId: string, patch: { interval?: number; lastDone?: string | undefined }) => {
+    form.setDraft(systems => systems.map(sys => sys.id !== sysId ? sys : {
+      ...sys,
+      subsystems: sys.subsystems.map(ss => ss.id !== subId ? ss : {
+        ...ss,
+        preservation: { ...(ss.preservation ?? { interval: 0 }), ...patch },
+      }),
+    }));
+  };
+
+  const handleSave = () => {
+    replaceSystems(project.id, form.draft);
+    form.commit();
+  };
+
+  const items = form.draft.flatMap(sys => sys.subsystems.map(ss => ({ sys, ss })));
 
   return (
     <div className="space-y-5">
