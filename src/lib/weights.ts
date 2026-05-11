@@ -87,10 +87,10 @@ export function resolveWeights(p?: Project | null): ProjectWeightProfile {
 
 /** Normalise a weight map so values sum to 100 (rounded). */
 export function normalize<K extends string>(w: WeightMap<K>): WeightMap<K> {
-  const total = Object.values(w).reduce((a, b) => a + (b as number), 0) || 1;
+  const total = (Object.values(w) as number[]).reduce((a, b) => a + b, 0) || 1;
   const out = {} as WeightMap<K>;
   (Object.keys(w) as K[]).forEach(k => {
-    out[k] = Math.round((w[k] / total) * 100);
+    out[k] = Math.round(((w[k] as number) / total) * 100);
   });
   return out;
 }

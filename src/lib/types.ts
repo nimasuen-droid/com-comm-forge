@@ -97,4 +97,10 @@ export interface Project {
   punches: PunchItem[];
   documents: DocumentItem[];
   workflow: WorkflowState;
+  /** Optional override of the global default progress weighting profile. */
+  progressWeights?: {
+    mc?: Partial<Record<MCCheckKey, number>>;
+    comm?: Partial<Record<CommCheckKey, number>>;
+    turnover?: Partial<Record<TurnoverCheckKey, number>>;
+  };
 }
