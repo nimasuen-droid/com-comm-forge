@@ -9,6 +9,14 @@ import { cn } from "@/lib/utils";
 type ProjectRoute = "/projects/$projectId/systems" | "/projects/$projectId/punch" | "/projects/$projectId/mc" | "/projects/$projectId/commissioning" | "/projects/$projectId/turnover" | "/projects/$projectId/preservation" | "/projects/$projectId/documents" | "/projects/$projectId/workflow";
 
 export function AppSidebar() {
+  return (
+    <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+      <SidebarBody />
+    </aside>
+  );
+}
+
+export function SidebarBody() {
   const pathname = useRouterState({ select: r => r.location.pathname });
   const activeId = useStore(s => s.activeProjectId);
   const projectExists = useStore(s => activeId ? s.projects.some(p => p.id === activeId) : false);
@@ -31,7 +39,7 @@ export function AppSidebar() {
   ] : [];
 
   return (
-    <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+    <div className="flex flex-col h-full w-full bg-sidebar text-sidebar-foreground">
       <div className="px-4 py-4 border-b border-sidebar-border">
         <Link to="/" className="flex items-center gap-2">
           <div className="h-9 w-9 rounded-md bg-gradient-to-br from-primary to-info flex items-center justify-center">
@@ -67,7 +75,7 @@ export function AppSidebar() {
           v1.0 · Local Storage
         </div>
       </div>
-    </aside>
+    </div>
   );
 }
 
