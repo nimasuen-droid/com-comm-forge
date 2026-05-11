@@ -8,6 +8,7 @@ import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { SaveBar } from "@/components/SaveBar";
+import { WeightingBasis } from "@/components/WeightingBasis";
 import { useDirtyForm } from "@/lib/useDirtyForm";
 import { deriveMcStatus } from "@/lib/derive";
 import { FileCheck, ShieldCheck, Check } from "lucide-react";
@@ -67,7 +68,7 @@ function MCPage() {
           <tbody className="divide-y divide-border">
             {form.draft.flatMap(sys => sys.subsystems.map(ss => {
               const openA = openAPunchesFor(project, sys, ss).length;
-              const { pct } = mcProgress(ss, openA === 0);
+              const { pct } = mcProgress(ss, openA === 0, project);
               return (
                 <tr key={ss.id} className="hover:bg-muted/20">
                   <td className="px-4 py-3">
@@ -111,6 +112,8 @@ function MCPage() {
           </tbody>
         </table>
       </div>
+
+      <WeightingBasis project={project} module="mc" />
 
       <SaveBar
         moduleLabel="Mechanical Completion"
