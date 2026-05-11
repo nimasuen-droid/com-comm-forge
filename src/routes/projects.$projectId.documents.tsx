@@ -2,13 +2,14 @@ import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import { useProject, useStore } from "@/lib/store";
 import { exportMcDossier, exportHandoverDossier, exportPunchRegister, exportPreservation, exportSystemRegister } from "@/lib/exports";
+import { exportStatusPresentation, exportVisualPdf } from "@/lib/visualReports";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { SaveBar } from "@/components/SaveBar";
 import { useDirtyForm } from "@/lib/useDirtyForm";
 import type { DocumentItem } from "@/lib/types";
-import { FileText, Plus, Trash2, Download, ShieldCheck, PackageCheck, ListChecks, Wrench, Network } from "lucide-react";
+import { FileText, Plus, Trash2, Download, ShieldCheck, PackageCheck, ListChecks, Wrench, Network, Presentation, FileImage } from "lucide-react";
 
 export const Route = createFileRoute("/projects/$projectId/documents")({
   component: DocsPage,
@@ -40,6 +41,10 @@ function DocsPage() {
     form.commit();
   };
 
+  const visualReports = [
+    { label: "Status Presentation", sub: ".pptx · executive deck", icon: Presentation, run: () => exportStatusPresentation(project) },
+    { label: "Visual Status Report", sub: ".pdf · one-page summary", icon: FileImage, run: () => exportVisualPdf(project) },
+  ];
   const reports = [
     { label: "System Register", icon: Network, run: () => exportSystemRegister(project) },
     { label: "Punch Register", icon: ListChecks, run: () => exportPunchRegister(project) },
@@ -54,7 +59,20 @@ function DocsPage() {
       <h2 className="text-xl font-bold flex items-center gap-2"><FileText className="h-5 w-5 text-info" /> Documentation & Reports</h2>
 
       <div className="panel p-4">
-        <div className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Generate project deliverables (Excel)</div>
+        <div className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Visual reports — offline / presentations</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+          {visualReports.map(r => (
+            <button key={r.label} onClick={r.run} className="flex items-center gap-3 rounded-md border border-accent/30 bg-gradient-to-br from-accent/10 to-primary/5 hover:from-accent/20 px-4 py-3 text-left">
+              <r.icon className="h-5 w-5 text-accent shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold">{r.label}</div>
+                <div className="text-[11px] text-muted-foreground">{r.sub}</div>
+              </div>
+              <Download className="h-4 w-4 text-muted-foreground" />
+            </button>
+          ))}
+        </div>
+        <div className="text-[11px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Project deliverables (Excel)</div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           {reports.map(r => (
             <button key={r.label} onClick={r.run} className="flex items-center gap-2 rounded-md border border-border bg-card hover:bg-muted/40 px-3 py-3 text-left">
