@@ -8,6 +8,7 @@ import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { SaveBar } from "@/components/SaveBar";
+import { WeightingBasis } from "@/components/WeightingBasis";
 import { useDirtyForm } from "@/lib/useDirtyForm";
 import { PackageCheck, FileCheck2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -76,7 +77,7 @@ function TurnoverPage() {
           </thead>
           <tbody className="divide-y divide-border">
             {form.draft.flatMap(sys => sys.subsystems.map(ss => {
-              const { pct } = turnoverProgress(ss);
+              const { pct } = turnoverProgress(ss, project);
               return (
                 <tr key={ss.id} className="hover:bg-muted/20">
                   <td className="px-4 py-3">
@@ -110,6 +111,8 @@ function TurnoverPage() {
           </tbody>
         </table>
       </div>
+
+      <WeightingBasis project={project} module="turnover" />
 
       <SaveBar
         moduleLabel="Turnover & Handover"
