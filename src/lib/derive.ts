@@ -1,5 +1,6 @@
 import type { Project, Subsystem, SystemNode, RAG, MCCheckKey, CommCheckKey, TurnoverCheckKey } from "./types";
 import { MC_CHECK_KEYS, COMM_CHECK_KEYS, TURNOVER_CHECK_KEYS } from "./types";
+import { resolveWeights, normalize } from "./weights";
 
 export function pctToRag(pct: number): RAG {
   if (pct >= 100) return "green";
@@ -8,20 +9,28 @@ export function pctToRag(pct: number): RAG {
   return "grey";
 }
 
-export function mcProgress(ss: Subsystem, openAClear?: boolean) {
+function weightedPct<K extends string>(keys: readonly K[], doneFor: (k: K) => boolean, weights: Record<K, number>) {
+  const w = normalize(weights);
+  const totalW = (Object.values(w) as number[]).reduce((a, b) => a + b, 0);
+  const earned = keys.reduce((acc, k) => acc + (doneFor(k) ? w[k] : 0), 0);
+  const done = keys.filter(doneFor).length;
+  return { done, total: keys.length, pct: Math.round((earned / totalW) * 100) };
+}
+
+export function mcProgress(ss: Subsystem, openAClear?: boolean, project?: Project | null) {
   const c = ss.mcChecks ?? {};
-  const done = MC_CHECK_KEYS.filter(k => k === "punchA" ? (openAClear ?? c[k]) : c[k]).length;
-  return { done, total: MC_CHECK_KEYS.length, pct: Math.round(done / MC_CHECK_KEYS.length * 100) };
+  const w = resolveWeights(project).mc;
+  return weightedPct(MC_CHECK_KEYS, k => k === "punchA" ? !!(openAClear ?? c[k]) : !!c[k], w);
 }
-export function commProgress(ss: Subsystem) {
+export function commProgress(ss: Subsystem, project?: Project | null) {
   const c = ss.commChecks ?? {};
-  const done = COMM_CHECK_KEYS.filter(k => c[k]).length;
-  return { done, total: COMM_CHECK_KEYS.length, pct: Math.round(done / COMM_CHECK_KEYS.length * 100) };
+  const w = resolveWeights(project).comm;
+  return weightedPct(COMM_CHECK_KEYS, k => !!c[k], w);
 }
-export function turnoverProgress(ss: Subsystem) {
+export function turnoverProgress(ss: Subsystem, project?: Project | null) {
   const c = ss.turnoverChecks ?? {};
-  const done = TURNOVER_CHECK_KEYS.filter(k => c[k]).length;
-  return { done, total: TURNOVER_CHECK_KEYS.length, pct: Math.round(done / TURNOVER_CHECK_KEYS.length * 100) };
+  const w = resolveWeights(project).turnover;
+  return weightedPct(TURNOVER_CHECK_KEYS, k => !!c[k], w);
 }
 
 export function openAPunchesFor(project: Project, sys: SystemNode, ss?: Subsystem) {
@@ -32,16 +41,16 @@ export function openAPunchesFor(project: Project, sys: SystemNode, ss?: Subsyste
   );
 }
 
-/** MC RAG derived from checklist + open A-punches gate. */
+/** MC RAG derived from weighted checklist + open A-punches gate. */
 export function deriveMcStatus(project: Project, sys: SystemNode, ss: Subsystem): RAG {
   const openAClear = openAPunchesFor(project, sys, ss).length === 0;
-  return pctToRag(mcProgress(ss, openAClear).pct);
+  return pctToRag(mcProgress(ss, openAClear, project).pct);
 }
-export function deriveCommStatus(_p: Project, _s: SystemNode, ss: Subsystem): RAG {
-  return pctToRag(commProgress(ss).pct);
+export function deriveCommStatus(project: Project, _s: SystemNode, ss: Subsystem): RAG {
+  return pctToRag(commProgress(ss, project).pct);
 }
-export function deriveTurnoverStatus(_p: Project, _s: SystemNode, ss: Subsystem): RAG {
-  return pctToRag(turnoverProgress(ss).pct);
+export function deriveTurnoverStatus(project: Project, _s: SystemNode, ss: Subsystem): RAG {
+  return pctToRag(turnoverProgress(ss, project).pct);
 }
 
 /** Roll up workflow % from real subsystem data. */
