@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { Plus, Menu, X } from "lucide-react";
-import { AppSidebar } from "./AppSidebar";
+import { SidebarBody } from "./AppSidebar";
 
 export function TopBar() {
   const pathname = useRouterState({ select: r => r.location.pathname });
@@ -63,21 +63,8 @@ export function TopBar() {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-72 bg-sidebar shadow-xl flex flex-col">
-            <div className="h-14 border-b border-sidebar-border flex items-center justify-end px-3">
-              <button
-                onClick={() => setMobileOpen(false)}
-                className="h-9 w-9 rounded-md hover:bg-muted/50 flex items-center justify-center"
-                aria-label="Close menu"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto" onClick={() => setMobileOpen(false)}>
-              <div className="md-force-show">
-                <AppSidebar />
-              </div>
-            </div>
+          <div className="absolute left-0 top-0 bottom-0 w-72 shadow-xl" onClick={() => setMobileOpen(false)}>
+            <SidebarBody />
           </div>
         </div>
       )}
