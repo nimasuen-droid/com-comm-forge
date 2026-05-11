@@ -24,11 +24,11 @@ export function WeightingBasis({ project, module }: { project: Project; module: 
   const updateProject = useStore(s => s.updateProject);
   const [editing, setEditing] = useState(false);
 
-  const resolved = resolveWeights(project)[module];
-  const normalised = normalize(resolved);
+  const resolved = resolveWeights(project)[module] as Record<string, number>;
+  const normalised = normalize(resolved) as Record<string, number>;
   const isOverridden = !!project.progressWeights?.[module];
   const basis = WEIGHT_BASIS[module];
-  const keys = ALL_KEYS[module];
+  const keys = ALL_KEYS[module] as readonly string[];
 
   const [draft, setDraft] = useState<Record<string, number>>(resolved);
   const draftTotal = Object.values(draft).reduce((a, b) => a + (Number(b) || 0), 0);
@@ -39,7 +39,7 @@ export function WeightingBasis({ project, module }: { project: Project; module: 
   };
   const save = () => {
     updateProject(project.id, {
-      progressWeights: { ...(project.progressWeights ?? {}), [module]: draft },
+      progressWeights: { ...(project.progressWeights ?? {}), [module]: draft } as Project["progressWeights"],
     });
     setEditing(false);
   };
