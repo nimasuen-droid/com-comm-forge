@@ -7,6 +7,7 @@ import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
 import { SaveBar } from "@/components/SaveBar";
+import { WeightingBasis } from "@/components/WeightingBasis";
 import { useDirtyForm } from "@/lib/useDirtyForm";
 import { Activity, Zap, Cpu, Flame, Wind, Droplets, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -84,7 +85,7 @@ function CommPage() {
           </thead>
           <tbody className="divide-y divide-border">
             {form.draft.flatMap(sys => sys.subsystems.map(ss => {
-              const { pct } = commProgress(ss);
+              const { pct } = commProgress(ss, project);
               const mcDone = (ss.mcChecks?.walkdown && ss.mcChecks?.hydrotest && ss.mcChecks?.flushing && ss.mcChecks?.reinstatement);
               return (
                 <tr key={ss.id} className={cn("hover:bg-muted/20", !mcDone && "opacity-60")}>
@@ -120,6 +121,8 @@ function CommPage() {
           </tbody>
         </table>
       </div>
+
+      <WeightingBasis project={project} module="comm" />
 
       <SaveBar
         moduleLabel="Commissioning"
