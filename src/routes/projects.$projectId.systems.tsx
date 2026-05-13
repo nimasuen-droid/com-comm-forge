@@ -5,6 +5,7 @@ import { ragDot } from "@/lib/kpi";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { RagLegend } from "@/components/RagLegend";
 import { SaveBar } from "@/components/SaveBar";
 import { useDirtyForm } from "@/lib/useDirtyForm";
 import { Plus, ChevronRight, ChevronDown, Trash2 } from "lucide-react";
