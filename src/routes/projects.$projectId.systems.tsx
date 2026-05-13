@@ -5,6 +5,7 @@ import { ragDot } from "@/lib/kpi";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
+import { RagLegend } from "@/components/RagLegend";
 import { SaveBar } from "@/components/SaveBar";
 import { useDirtyForm } from "@/lib/useDirtyForm";
 import { Plus, ChevronRight, ChevronDown, Trash2 } from "lucide-react";
@@ -68,6 +69,8 @@ function SystemsPage() {
           <Plus className="h-3.5 w-3.5" /> New System
         </button>
       </div>
+
+      <RagLegend />
 
       <div className="panel divide-y divide-border">
         {form.draft.length === 0 && (
