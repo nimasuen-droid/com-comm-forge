@@ -70,6 +70,8 @@ function SystemsPage() {
         </button>
       </div>
 
+      <RagLegend />
+
       <div className="panel divide-y divide-border">
         {form.draft.length === 0 && (
           <div className="p-8 text-center text-muted-foreground text-sm">No systems defined. Create your first system to start subsystem breakdown.</div>
