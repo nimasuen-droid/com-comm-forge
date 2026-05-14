@@ -1,4 +1,12 @@
-import type { Project, Subsystem, SystemNode, RAG, MCCheckKey, CommCheckKey, TurnoverCheckKey } from "./types";
+import type {
+  Project,
+  Subsystem,
+  SystemNode,
+  RAG,
+  MCCheckKey,
+  CommCheckKey,
+  TurnoverCheckKey,
+} from "./types";
 import { MC_CHECK_KEYS, COMM_CHECK_KEYS, TURNOVER_CHECK_KEYS } from "./types";
 import { resolveWeights, normalize } from "./weights";
 
@@ -9,7 +17,11 @@ export function pctToRag(pct: number): RAG {
   return "grey";
 }
 
-function weightedPct<K extends string>(keys: readonly K[], doneFor: (k: K) => boolean, weights: Record<K, number>) {
+function weightedPct<K extends string>(
+  keys: readonly K[],
+  doneFor: (k: K) => boolean,
+  weights: Record<K, number>,
+) {
   const w = normalize(weights);
   const totalW = (Object.values(w) as number[]).reduce((a, b) => a + b, 0);
   const earned = keys.reduce((acc, k) => acc + (doneFor(k) ? w[k] : 0), 0);
@@ -20,24 +32,26 @@ function weightedPct<K extends string>(keys: readonly K[], doneFor: (k: K) => bo
 export function mcProgress(ss: Subsystem, openAClear?: boolean, project?: Project | null) {
   const c = ss.mcChecks ?? {};
   const w = resolveWeights(project).mc;
-  return weightedPct(MC_CHECK_KEYS, k => k === "punchA" ? !!(openAClear ?? c[k]) : !!c[k], w);
+  return weightedPct(MC_CHECK_KEYS, (k) => (k === "punchA" ? !!(openAClear ?? c[k]) : !!c[k]), w);
 }
 export function commProgress(ss: Subsystem, project?: Project | null) {
   const c = ss.commChecks ?? {};
   const w = resolveWeights(project).comm;
-  return weightedPct(COMM_CHECK_KEYS, k => !!c[k], w);
+  return weightedPct(COMM_CHECK_KEYS, (k) => !!c[k], w);
 }
 export function turnoverProgress(ss: Subsystem, project?: Project | null) {
   const c = ss.turnoverChecks ?? {};
   const w = resolveWeights(project).turnover;
-  return weightedPct(TURNOVER_CHECK_KEYS, k => !!c[k], w);
+  return weightedPct(TURNOVER_CHECK_KEYS, (k) => !!c[k], w);
 }
 
 export function openAPunchesFor(project: Project, sys: SystemNode, ss?: Subsystem) {
-  return project.punches.filter(p =>
-    p.systemId === sys.id &&
-    (!ss || !p.subsystemId || p.subsystemId === ss.id) &&
-    p.category === "A" && p.status !== "closed"
+  return project.punches.filter(
+    (p) =>
+      p.systemId === sys.id &&
+      (!ss || !p.subsystemId || p.subsystemId === ss.id) &&
+      p.category === "A" &&
+      p.status !== "closed",
   );
 }
 
@@ -55,11 +69,13 @@ export function deriveTurnoverStatus(project: Project, _s: SystemNode, ss: Subsy
 
 /** Roll up workflow % from real subsystem data. */
 export function deriveWorkflow(project: Project) {
-  const subs = project.systems.flatMap(s => s.subsystems);
+  const subs = project.systems.flatMap((s) => s.subsystems);
   if (!subs.length) return project.workflow;
   const n = subs.length;
-  const mcVals = project.systems.flatMap(s => s.subsystems.map(ss => mcProgress(ss, openAPunchesFor(project, s, ss).length === 0).pct));
-  const mc = Math.round(mcVals.reduce((a,b)=>a+b,0) / n);
+  const mcVals = project.systems.flatMap((s) =>
+    s.subsystems.map((ss) => mcProgress(ss, openAPunchesFor(project, s, ss).length === 0).pct),
+  );
+  const mc = Math.round(mcVals.reduce((a, b) => a + b, 0) / n);
   const comm = Math.round(subs.reduce((a, ss) => a + commProgress(ss).pct, 0) / n);
   const handover = Math.round(subs.reduce((a, ss) => a + turnoverProgress(ss).pct, 0) / n);
   return {

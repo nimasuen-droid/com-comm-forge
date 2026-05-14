@@ -57,7 +57,10 @@ export const DEFAULT_WEIGHTS: ProjectWeightProfile = {
   },
 };
 
-export const WEIGHT_BASIS: Record<keyof ProjectWeightProfile, { rationale: string; source: string }> = {
+export const WEIGHT_BASIS: Record<
+  keyof ProjectWeightProfile,
+  { rationale: string; source: string }
+> = {
   mc: {
     rationale:
       "Hydrotest and A-punch closure are absolute gates — failure invalidates MC. Walkdown and preservation matter but rarely block.",
@@ -89,7 +92,7 @@ export function resolveWeights(p?: Project | null): ProjectWeightProfile {
 export function normalize<K extends string>(w: WeightMap<K>): WeightMap<K> {
   const total = (Object.values(w) as number[]).reduce((a, b) => a + b, 0) || 1;
   const out = {} as WeightMap<K>;
-  (Object.keys(w) as K[]).forEach(k => {
+  (Object.keys(w) as K[]).forEach((k) => {
     out[k] = Math.round(((w[k] as number) / total) * 100);
   });
   return out;

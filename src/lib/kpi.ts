@@ -17,11 +17,11 @@ export const ragDot: Record<RAG, string> = {
 const ragScore: Record<RAG, number> = { green: 100, amber: 50, red: 10, grey: 0 };
 
 export function projectKpis(p: Project) {
-  const subs = p.systems.flatMap(s => s.subsystems);
+  const subs = p.systems.flatMap((s) => s.subsystems);
   const total = subs.length || 1;
   const avg = (key: "mcStatus" | "rfsuStatus" | "commStatus" | "turnoverStatus") =>
     Math.round(subs.reduce((acc, s) => acc + ragScore[s[key]], 0) / total);
-  const punchOpen = p.punches.filter(x => x.status !== "closed");
+  const punchOpen = p.punches.filter((x) => x.status !== "closed");
   return {
     systems: p.systems.length,
     subsystems: subs.length,
@@ -31,9 +31,9 @@ export function projectKpis(p: Project) {
     handoverPct: avg("turnoverStatus"),
     punchTotal: p.punches.length,
     punchOpen: punchOpen.length,
-    punchA: punchOpen.filter(x => x.category === "A").length,
-    punchB: punchOpen.filter(x => x.category === "B").length,
-    punchC: punchOpen.filter(x => x.category === "C").length,
+    punchA: punchOpen.filter((x) => x.category === "A").length,
+    punchB: punchOpen.filter((x) => x.category === "B").length,
+    punchC: punchOpen.filter((x) => x.category === "C").length,
   };
 }
 

@@ -2,7 +2,15 @@ import { ragDot } from "@/lib/kpi";
 import type { RAG } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export function StatusDot({ status, label, className }: { status: RAG; label?: string; className?: string }) {
+export function StatusDot({
+  status,
+  label,
+  className,
+}: {
+  status: RAG;
+  label?: string;
+  className?: string;
+}) {
   return (
     <span className={cn("inline-flex items-center gap-1.5 text-xs", className)}>
       <span className={cn("h-2 w-2 rounded-full ring-2 ring-background", ragDot[status])} />
@@ -11,7 +19,13 @@ export function StatusDot({ status, label, className }: { status: RAG; label?: s
   );
 }
 
-export function PercentBar({ value, tone = "primary" }: { value: number; tone?: "primary" | "success" | "warning" | "destructive" | "accent" }) {
+export function PercentBar({
+  value,
+  tone = "primary",
+}: {
+  value: number;
+  tone?: "primary" | "success" | "warning" | "destructive" | "accent";
+}) {
   const colorClass = {
     primary: "bg-primary",
     success: "bg-success",
@@ -21,7 +35,10 @@ export function PercentBar({ value, tone = "primary" }: { value: number; tone?: 
   }[tone];
   return (
     <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-      <div className={cn("h-full transition-all", colorClass)} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
+      <div
+        className={cn("h-full transition-all", colorClass)}
+        style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+      />
     </div>
   );
 }

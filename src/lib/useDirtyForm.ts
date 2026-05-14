@@ -50,12 +50,15 @@ export function useDirtyForm<T>(initial: T) {
   }, []);
 
   /** Promote a (possibly externally-recomputed) value to the new baseline + draft and stamp lastSaved. */
-  const commit = useCallback((next?: T) => {
-    const v = (next ?? draft) as T;
-    setDraft(v);
-    setBaseline(v);
-    setLastSaved(new Date());
-  }, [draft]);
+  const commit = useCallback(
+    (next?: T) => {
+      const v = (next ?? draft) as T;
+      setDraft(v);
+      setBaseline(v);
+      setLastSaved(new Date());
+    },
+    [draft],
+  );
 
   return { draft, setDraft, baseline, isDirty, lastSaved, markSaved, discard, reset, commit };
 }

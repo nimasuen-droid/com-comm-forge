@@ -18,7 +18,9 @@ const C = {
   grey: "566175",
 };
 
-function safe(name: string) { return name.replace(/[^A-Za-z0-9_-]+/g, "_"); }
+function safe(name: string) {
+  return name.replace(/[^A-Za-z0-9_-]+/g, "_");
+}
 function ragHex(r: string) {
   return r === "green" ? C.green : r === "amber" ? C.amber : r === "red" ? C.red : C.grey;
 }
@@ -33,33 +35,72 @@ export function exportStatusPresentation(p: Project) {
   pres.company = p.client;
 
   const k = projectKpis(p);
-  const subs = p.systems.flatMap(s => s.subsystems);
+  const subs = p.systems.flatMap((s) => s.subsystems);
 
   // ---------- Slide 1: Cover ----------
   const s1 = pres.addSlide();
   s1.background = { color: C.bg };
   s1.addShape(pres.ShapeType.rect, { x: 0, y: 0, w: 0.25, h: 7.5, fill: { color: C.accent } });
   s1.addText("COMPLETIONS & COMMISSIONING", {
-    x: 0.7, y: 0.6, w: 12, h: 0.4, color: C.muted, fontFace: "Calibri", fontSize: 14, bold: true, charSpacing: 4,
+    x: 0.7,
+    y: 0.6,
+    w: 12,
+    h: 0.4,
+    color: C.muted,
+    fontFace: "Calibri",
+    fontSize: 14,
+    bold: true,
+    charSpacing: 4,
   });
   s1.addText(p.name, {
-    x: 0.7, y: 1.2, w: 12, h: 1.4, color: C.text, fontFace: "Georgia", fontSize: 44, bold: true,
+    x: 0.7,
+    y: 1.2,
+    w: 12,
+    h: 1.4,
+    color: C.text,
+    fontFace: "Georgia",
+    fontSize: 44,
+    bold: true,
   });
   s1.addText(`${p.client}  ·  ${p.location}  ·  ${p.type}`, {
-    x: 0.7, y: 2.7, w: 12, h: 0.5, color: C.primary, fontFace: "Calibri", fontSize: 18,
+    x: 0.7,
+    y: 2.7,
+    w: 12,
+    h: 0.5,
+    color: C.primary,
+    fontFace: "Calibri",
+    fontSize: 18,
   });
   s1.addText(`Issued ${new Date().toLocaleDateString()}`, {
-    x: 0.7, y: 6.7, w: 12, h: 0.4, color: C.muted, fontFace: "Calibri", fontSize: 12,
+    x: 0.7,
+    y: 6.7,
+    w: 12,
+    h: 0.4,
+    color: C.muted,
+    fontFace: "Calibri",
+    fontSize: 12,
   });
 
   // ---------- Slide 2: KPI dashboard ----------
   const s2 = pres.addSlide();
   s2.background = { color: C.bg };
   s2.addText("Project Status at a Glance", {
-    x: 0.5, y: 0.3, w: 12.3, h: 0.6, color: C.text, fontFace: "Georgia", fontSize: 28, bold: true,
+    x: 0.5,
+    y: 0.3,
+    w: 12.3,
+    h: 0.6,
+    color: C.text,
+    fontFace: "Georgia",
+    fontSize: 28,
+    bold: true,
   });
   s2.addText(`${p.name} · ${new Date().toLocaleDateString()}`, {
-    x: 0.5, y: 0.95, w: 12.3, h: 0.3, color: C.muted, fontSize: 12,
+    x: 0.5,
+    y: 0.95,
+    w: 12.3,
+    h: 0.3,
+    color: C.muted,
+    fontSize: 12,
   });
 
   const tiles = [
@@ -70,37 +111,102 @@ export function exportStatusPresentation(p: Project) {
     { label: "Comm %", value: `${k.commPct}%`, tone: C.accent },
     { label: "Handover %", value: `${k.handoverPct}%`, tone: C.accent },
     { label: "Open A-Punches", value: String(k.punchA), tone: k.punchA > 0 ? C.red : C.green },
-    { label: "Open Punches", value: String(k.punchOpen), tone: k.punchOpen > 0 ? C.amber : C.green },
+    {
+      label: "Open Punches",
+      value: String(k.punchOpen),
+      tone: k.punchOpen > 0 ? C.amber : C.green,
+    },
   ];
-  const tileW = 2.95, tileH = 1.6, gap = 0.2;
+  const tileW = 2.95,
+    tileH = 1.6,
+    gap = 0.2;
   tiles.forEach((t, i) => {
-    const col = i % 4, row = Math.floor(i / 4);
+    const col = i % 4,
+      row = Math.floor(i / 4);
     const x = 0.5 + col * (tileW + gap);
     const y = 1.5 + row * (tileH + gap);
     s2.addShape(pres.ShapeType.roundRect, {
-      x, y, w: tileW, h: tileH, fill: { color: C.panel }, line: { color: C.panel }, rectRadius: 0.08,
+      x,
+      y,
+      w: tileW,
+      h: tileH,
+      fill: { color: C.panel },
+      line: { color: C.panel },
+      rectRadius: 0.08,
     });
-    s2.addShape(pres.ShapeType.rect, { x, y, w: 0.08, h: tileH, fill: { color: t.tone }, line: { color: t.tone } });
-    s2.addText(t.label, { x: x + 0.25, y: y + 0.15, w: tileW - 0.4, h: 0.35, color: C.muted, fontSize: 11, bold: true, charSpacing: 2 });
-    s2.addText(t.value, { x: x + 0.25, y: y + 0.5, w: tileW - 0.4, h: 1, color: C.text, fontFace: "Georgia", fontSize: 36, bold: true });
+    s2.addShape(pres.ShapeType.rect, {
+      x,
+      y,
+      w: 0.08,
+      h: tileH,
+      fill: { color: t.tone },
+      line: { color: t.tone },
+    });
+    s2.addText(t.label, {
+      x: x + 0.25,
+      y: y + 0.15,
+      w: tileW - 0.4,
+      h: 0.35,
+      color: C.muted,
+      fontSize: 11,
+      bold: true,
+      charSpacing: 2,
+    });
+    s2.addText(t.value, {
+      x: x + 0.25,
+      y: y + 0.5,
+      w: tileW - 0.4,
+      h: 1,
+      color: C.text,
+      fontFace: "Georgia",
+      fontSize: 36,
+      bold: true,
+    });
   });
 
   // Punch breakdown chart
-  s2.addText("Open Punch Breakdown", { x: 0.5, y: 5.1, w: 6, h: 0.35, color: C.text, fontSize: 14, bold: true });
-  s2.addChart(pres.ChartType.bar, [{
-    name: "Open",
-    labels: ["Cat A", "Cat B", "Cat C"],
-    values: [k.punchA, k.punchB, k.punchC],
-  }], {
-    x: 0.5, y: 5.4, w: 6, h: 1.9,
-    chartColors: [C.red, C.amber, C.primary],
-    showLegend: false, showValue: true,
-    catAxisLabelColor: C.muted, valAxisLabelColor: C.muted,
-    plotArea: { fill: { color: C.bg } },
+  s2.addText("Open Punch Breakdown", {
+    x: 0.5,
+    y: 5.1,
+    w: 6,
+    h: 0.35,
+    color: C.text,
+    fontSize: 14,
+    bold: true,
   });
+  s2.addChart(
+    pres.ChartType.bar,
+    [
+      {
+        name: "Open",
+        labels: ["Cat A", "Cat B", "Cat C"],
+        values: [k.punchA, k.punchB, k.punchC],
+      },
+    ],
+    {
+      x: 0.5,
+      y: 5.4,
+      w: 6,
+      h: 1.9,
+      chartColors: [C.red, C.amber, C.primary],
+      showLegend: false,
+      showValue: true,
+      catAxisLabelColor: C.muted,
+      valAxisLabelColor: C.muted,
+      plotArea: { fill: { color: C.bg } },
+    },
+  );
 
   // Workflow gauge bars
-  s2.addText("Workflow Progress", { x: 7, y: 5.1, w: 6, h: 0.35, color: C.text, fontSize: 14, bold: true });
+  s2.addText("Workflow Progress", {
+    x: 7,
+    y: 5.1,
+    w: 6,
+    h: 0.35,
+    color: C.text,
+    fontSize: 14,
+    bold: true,
+  });
   const wf: [string, number][] = [
     ["Construction", p.workflow.construction],
     ["MC", k.mcPct],
@@ -111,23 +217,61 @@ export function exportStatusPresentation(p: Project) {
   wf.forEach((row, i) => {
     const yy = 5.5 + i * 0.36;
     s2.addText(row[0], { x: 7, y: yy, w: 1.6, h: 0.3, color: C.muted, fontSize: 10 });
-    s2.addShape(pres.ShapeType.rect, { x: 8.6, y: yy + 0.05, w: 4.0, h: 0.18, fill: { color: C.panel }, line: { color: C.panel } });
+    s2.addShape(pres.ShapeType.rect, {
+      x: 8.6,
+      y: yy + 0.05,
+      w: 4.0,
+      h: 0.18,
+      fill: { color: C.panel },
+      line: { color: C.panel },
+    });
     const barW = Math.max(0.05, 4.0 * (row[1] / 100));
-    s2.addShape(pres.ShapeType.rect, { x: 8.6, y: yy + 0.05, w: barW, h: 0.18, fill: { color: C.primary }, line: { color: C.primary } });
-    s2.addText(`${row[1]}%`, { x: 12.65, y: yy, w: 0.65, h: 0.3, color: C.text, fontSize: 10, bold: true });
+    s2.addShape(pres.ShapeType.rect, {
+      x: 8.6,
+      y: yy + 0.05,
+      w: barW,
+      h: 0.18,
+      fill: { color: C.primary },
+      line: { color: C.primary },
+    });
+    s2.addText(`${row[1]}%`, {
+      x: 12.65,
+      y: yy,
+      w: 0.65,
+      h: 0.3,
+      color: C.text,
+      fontSize: 10,
+      bold: true,
+    });
   });
 
   // ---------- Slide 3: System status matrix ----------
   const s3 = pres.addSlide();
   s3.background = { color: C.bg };
-  s3.addText("System Status Matrix", { x: 0.5, y: 0.3, w: 12.3, h: 0.5, color: C.text, fontFace: "Georgia", fontSize: 26, bold: true });
-  s3.addText("RAG status across MC · RFSU · Commissioning · Handover", { x: 0.5, y: 0.85, w: 12.3, h: 0.3, color: C.muted, fontSize: 11 });
+  s3.addText("System Status Matrix", {
+    x: 0.5,
+    y: 0.3,
+    w: 12.3,
+    h: 0.5,
+    color: C.text,
+    fontFace: "Georgia",
+    fontSize: 26,
+    bold: true,
+  });
+  s3.addText("RAG status across MC · RFSU · Commissioning · Handover", {
+    x: 0.5,
+    y: 0.85,
+    w: 12.3,
+    h: 0.3,
+    color: C.muted,
+    fontSize: 11,
+  });
 
   const head = [
     ["System", "Subsystem", "Disc", "MC %", "MC", "Comm %", "Comm", "T/O %", "T/O", "Open A"],
   ];
-  const rows = subs.slice(0, 16).map(ss => {
-    const sys = p.systems.find(s => s.subsystems.some(x => x.id === ss.id))!;
+  const rows = subs.slice(0, 16).map((ss) => {
+    const sys = p.systems.find((s) => s.subsystems.some((x) => x.id === ss.id))!;
     const openA = openAPunchesFor(p, sys, ss).length;
     const mc = mcProgress(ss, openA === 0).pct;
     const co = commProgress(ss).pct;
@@ -139,42 +283,97 @@ export function exportStatusPresentation(p: Project) {
       { text: `${mc}%`, options: { color: C.text } },
       { text: "●", options: { color: ragHex(ss.mcStatus), bold: true, align: "center" as const } },
       { text: `${co}%`, options: { color: C.text } },
-      { text: "●", options: { color: ragHex(ss.commStatus), bold: true, align: "center" as const } },
+      {
+        text: "●",
+        options: { color: ragHex(ss.commStatus), bold: true, align: "center" as const },
+      },
       { text: `${to}%`, options: { color: C.text } },
-      { text: "●", options: { color: ragHex(ss.turnoverStatus), bold: true, align: "center" as const } },
-      { text: openA ? String(openA) : "—", options: { color: openA ? C.red : C.muted, bold: openA > 0 } },
+      {
+        text: "●",
+        options: { color: ragHex(ss.turnoverStatus), bold: true, align: "center" as const },
+      },
+      {
+        text: openA ? String(openA) : "—",
+        options: { color: openA ? C.red : C.muted, bold: openA > 0 },
+      },
     ];
   });
-  s3.addTable([
-    head[0].map(h => ({ text: h, options: { bold: true, color: C.bg, fill: { color: C.accent }, align: "left" as const } })),
-    ...rows,
-  ], {
-    x: 0.5, y: 1.2, w: 12.3, h: 5.8,
-    colW: [1.3, 3.5, 0.9, 1.0, 0.7, 1.0, 0.8, 1.0, 0.8, 1.3],
-    fontSize: 10, fontFace: "Calibri",
-    border: { type: "solid", pt: 0.5, color: C.panel },
-  });
+  s3.addTable(
+    [
+      head[0].map((h) => ({
+        text: h,
+        options: { bold: true, color: C.bg, fill: { color: C.accent }, align: "left" as const },
+      })),
+      ...rows,
+    ],
+    {
+      x: 0.5,
+      y: 1.2,
+      w: 12.3,
+      h: 5.8,
+      colW: [1.3, 3.5, 0.9, 1.0, 0.7, 1.0, 0.8, 1.0, 0.8, 1.3],
+      fontSize: 10,
+      fontFace: "Calibri",
+      border: { type: "solid", pt: 0.5, color: C.panel },
+    },
+  );
   if (subs.length > 16) {
     s3.addText(`+ ${subs.length - 16} more subsystems — see full register export`, {
-      x: 0.5, y: 7.05, w: 12.3, h: 0.3, color: C.muted, fontSize: 10, italic: true,
+      x: 0.5,
+      y: 7.05,
+      w: 12.3,
+      h: 0.3,
+      color: C.muted,
+      fontSize: 10,
+      italic: true,
     });
   }
 
   // ---------- Slide 4: Risks & next steps ----------
   const s4 = pres.addSlide();
   s4.background = { color: C.bg };
-  s4.addText("Risks & Next Actions", { x: 0.5, y: 0.3, w: 12.3, h: 0.5, color: C.text, fontFace: "Georgia", fontSize: 26, bold: true });
+  s4.addText("Risks & Next Actions", {
+    x: 0.5,
+    y: 0.3,
+    w: 12.3,
+    h: 0.5,
+    color: C.text,
+    fontFace: "Georgia",
+    fontSize: 26,
+    bold: true,
+  });
 
   // Top open A-punches
-  const openA = p.punches.filter(x => x.category === "A" && x.status !== "closed").slice(0, 6);
-  s4.addText("Top Open A-Punches (gates MC)", { x: 0.5, y: 1.0, w: 6, h: 0.35, color: C.red, fontSize: 14, bold: true });
+  const openA = p.punches.filter((x) => x.category === "A" && x.status !== "closed").slice(0, 6);
+  s4.addText("Top Open A-Punches (gates MC)", {
+    x: 0.5,
+    y: 1.0,
+    w: 6,
+    h: 0.35,
+    color: C.red,
+    fontSize: 14,
+    bold: true,
+  });
   if (openA.length === 0) {
-    s4.addText("No open A-punches — MC gate clear.", { x: 0.5, y: 1.4, w: 6, h: 0.4, color: C.green, fontSize: 12, italic: true });
+    s4.addText("No open A-punches — MC gate clear.", {
+      x: 0.5,
+      y: 1.4,
+      w: 6,
+      h: 0.4,
+      color: C.green,
+      fontSize: 12,
+      italic: true,
+    });
   } else {
     openA.forEach((x, i) => {
-      const sys = p.systems.find(s => s.id === x.systemId);
+      const sys = p.systems.find((s) => s.id === x.systemId);
       s4.addText(`• ${x.title}  ·  ${sys?.code ?? ""}  ·  ${x.discipline}`, {
-        x: 0.5, y: 1.4 + i * 0.4, w: 6, h: 0.35, color: C.text, fontSize: 11,
+        x: 0.5,
+        y: 1.4 + i * 0.4,
+        w: 6,
+        h: 0.35,
+        color: C.text,
+        fontSize: 11,
       });
     });
   }
@@ -182,17 +381,39 @@ export function exportStatusPresentation(p: Project) {
   // Recommendations
   const recs = [
     `Drive open A-punches to closure — gate to MC certificates.`,
-    `Reconcile preservation register; ${subs.filter(s => !s.preservation?.interval).length} subsystems have no interval set.`,
+    `Reconcile preservation register; ${subs.filter((s) => !s.preservation?.interval).length} subsystems have no interval set.`,
     `Lift Commissioning average (${k.commPct}%) by clearing loop checks & C&E validations.`,
     `Compile Turnover dossier per subsystem — avoid end-of-project crunch.`,
   ];
-  s4.addText("Recommended Actions", { x: 7, y: 1.0, w: 6, h: 0.35, color: C.accent, fontSize: 14, bold: true });
+  s4.addText("Recommended Actions", {
+    x: 7,
+    y: 1.0,
+    w: 6,
+    h: 0.35,
+    color: C.accent,
+    fontSize: 14,
+    bold: true,
+  });
   recs.forEach((r, i) => {
-    s4.addText(`${i + 1}. ${r}`, { x: 7, y: 1.4 + i * 0.55, w: 6, h: 0.5, color: C.text, fontSize: 11 });
+    s4.addText(`${i + 1}. ${r}`, {
+      x: 7,
+      y: 1.4 + i * 0.55,
+      w: 6,
+      h: 0.5,
+      color: C.text,
+      fontSize: 11,
+    });
   });
 
   s4.addText("Generated by Completions & Commissioning Pro", {
-    x: 0.5, y: 7.0, w: 12.3, h: 0.3, color: C.muted, fontSize: 10, italic: true, align: "center",
+    x: 0.5,
+    y: 7.0,
+    w: 12.3,
+    h: 0.3,
+    color: C.muted,
+    fontSize: 10,
+    italic: true,
+    align: "center",
   });
 
   pres.writeFile({ fileName: `${safe(p.name)}_Status_Presentation.pptx` });
@@ -241,7 +462,10 @@ export function exportVisualPdf(p: Project) {
     ["Open A", String(k.punchA), k.punchA > 0 ? C.red : C.green],
     ["Open Punch", String(k.punchOpen), k.punchOpen > 0 ? C.amber : C.green],
   ];
-  const tx = 28, ty = 110, tw = (W - 56 - 7 * 8) / 8, th = 70;
+  const tx = 28,
+    ty = 110,
+    tw = (W - 56 - 7 * 8) / 8,
+    th = 70;
   tiles.forEach((t, i) => {
     const x = tx + i * (tw + 8);
     doc.setFillColor(C.panel);
@@ -271,7 +495,8 @@ export function exportVisualPdf(p: Project) {
     ["Commissioning", k.commPct],
     ["Handover", k.handoverPct],
   ];
-  const barX = 160, barW = (W / 2) - barX - 28;
+  const barX = 160,
+    barW = W / 2 - barX - 28;
   wf.forEach((row, i) => {
     const yy = y + i * 22;
     doc.setFont("helvetica", "normal");
@@ -300,8 +525,9 @@ export function exportVisualPdf(p: Project) {
     ["Category B", k.punchB, C.amber],
     ["Category C", k.punchC, C.primary],
   ];
-  const max = Math.max(1, ...punchRows.map(r => r[1]));
-  const pBarX = rx + 140, pBarW = W - 28 - pBarX;
+  const max = Math.max(1, ...punchRows.map((r) => r[1]));
+  const pBarX = rx + 140,
+    pBarW = W - 28 - pBarX;
   punchRows.forEach((row, i) => {
     const yy = ry + i * 26;
     doc.setFont("helvetica", "normal");
@@ -337,7 +563,7 @@ export function exportVisualPdf(p: Project) {
     { label: "OPEN A", x: 560, w: 60 },
     { label: "PRIORITY", x: 630, w: 80 },
   ];
-  cols.forEach(c => doc.text(c.label, c.x, y + 12));
+  cols.forEach((c) => doc.text(c.label, c.x, y + 12));
   y += 18;
 
   const topSystems = p.systems.slice(0, 8);
@@ -348,15 +574,26 @@ export function exportVisualPdf(p: Project) {
       doc.rect(28, yy, W - 56, 22, "F");
     }
     const subAvgMc = sys.subsystems.length
-      ? Math.round(sys.subsystems.reduce((a, ss) => a + mcProgress(ss, openAPunchesFor(p, sys, ss).length === 0).pct, 0) / sys.subsystems.length)
+      ? Math.round(
+          sys.subsystems.reduce(
+            (a, ss) => a + mcProgress(ss, openAPunchesFor(p, sys, ss).length === 0).pct,
+            0,
+          ) / sys.subsystems.length,
+        )
       : 0;
     const subAvgCo = sys.subsystems.length
-      ? Math.round(sys.subsystems.reduce((a, ss) => a + commProgress(ss).pct, 0) / sys.subsystems.length)
+      ? Math.round(
+          sys.subsystems.reduce((a, ss) => a + commProgress(ss).pct, 0) / sys.subsystems.length,
+        )
       : 0;
     const subAvgTo = sys.subsystems.length
-      ? Math.round(sys.subsystems.reduce((a, ss) => a + turnoverProgress(ss).pct, 0) / sys.subsystems.length)
+      ? Math.round(
+          sys.subsystems.reduce((a, ss) => a + turnoverProgress(ss).pct, 0) / sys.subsystems.length,
+        )
       : 0;
-    const oA = p.punches.filter(x => x.systemId === sys.id && x.category === "A" && x.status !== "closed").length;
+    const oA = p.punches.filter(
+      (x) => x.systemId === sys.id && x.category === "A" && x.status !== "closed",
+    ).length;
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(C.text);

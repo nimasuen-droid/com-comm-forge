@@ -17,7 +17,8 @@ export const ABBREVIATIONS: Record<string, string> = {
   PHA: "Process Hazard Analysis — structured identification of process hazards (HAZOP, LOPA…).",
   HAZOP: "Hazard & Operability study — structured P&ID-based hazard identification workshop.",
   LOPA: "Layer of Protection Analysis — semi-quantitative method to assign SIL targets.",
-  "C&E": "Cause & Effect matrix — the table of inputs (causes) and outputs (effects) that defines plant safety logic.",
+  "C&E":
+    "Cause & Effect matrix — the table of inputs (causes) and outputs (effects) that defines plant safety logic.",
   DCS: "Distributed Control System — the plant's main process control system.",
   ICSS: "Integrated Control & Safety System — combined DCS + SIS package.",
   PLC: "Programmable Logic Controller — controller used in packaged equipment and some safety/control duties.",
@@ -29,7 +30,7 @@ export const ABBREVIATIONS: Record<string, string> = {
   FME: "Foreign Material Exclusion — the discipline of keeping debris out of opened systems.",
   XV: "On/Off (shutdown) Valve — typically actuated, used in interlocks.",
   "MV/LV": "Medium Voltage / Low Voltage — electrical voltage classes.",
-  "HV": "High Voltage.",
+  HV: "High Voltage.",
   N2: "Nitrogen — used for inerting, blanketing and preservation.",
   "N₂": "Nitrogen — used for inerting, blanketing and preservation.",
   CMMS: "Computerised Maintenance Management System — operations' maintenance database (e.g. SAP PM, Maximo).",

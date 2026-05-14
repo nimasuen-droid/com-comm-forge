@@ -1,7 +1,36 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "tanstack-start-app",
+  "name": "ccpro",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
+  "observability": {
+    "enabled": true,
+  },
+  "vars": {
+    "APP_ENV": "local",
+    "APP_NAME": "Completions & Commissioning Pro",
+    "PUBLIC_APP_URL": "http://localhost:5173",
+    "ERROR_MONITORING_ENABLED": "false",
+  },
+  "env": {
+    "staging": {
+      "name": "ccpro-staging",
+      "vars": {
+        "APP_ENV": "staging",
+        "APP_NAME": "Completions & Commissioning Pro",
+        "PUBLIC_APP_URL": "https://staging.ccpro.example.com",
+        "ERROR_MONITORING_ENABLED": "true",
+      },
+    },
+    "production": {
+      "name": "ccpro-production",
+      "vars": {
+        "APP_ENV": "production",
+        "APP_NAME": "Completions & Commissioning Pro",
+        "PUBLIC_APP_URL": "https://ccpro.example.com",
+        "ERROR_MONITORING_ENABLED": "true",
+      },
+    },
+  },
 }

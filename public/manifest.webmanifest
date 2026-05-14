@@ -1,0 +1,19 @@
+{
+  "name": "Completions & Commissioning Pro",
+  "short_name": "CC Pro",
+  "description": "Field execution workspace for EPC completions, punch, MC, commissioning, and turnover.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f1a2a",
+  "theme_color": "#0f1a2a",
+  "orientation": "any",
+  "categories": ["productivity", "business"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48 64x64 128x128 256x256",
+      "type": "image/x-icon"
+    }
+  ]
+}

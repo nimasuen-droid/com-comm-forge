@@ -72,24 +72,50 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: "#0f1a2a" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "CC Pro" },
       { title: "Completions & Commissioning Pro" },
-      { name: "description", content: "EPC completions, punch list, mechanical completion, commissioning, and turnover management for oil & gas, refinery, petrochemical, and offshore projects." },
+      {
+        name: "description",
+        content:
+          "EPC completions, punch list, mechanical completion, commissioning, and turnover management for oil & gas, refinery, petrochemical, and offshore projects.",
+      },
       { name: "author", content: "Completions & Commissioning Pro" },
       { property: "og:title", content: "Completions & Commissioning Pro" },
-      { property: "og:description", content: "EPC completions, punch list, mechanical completion, commissioning, and turnover management for oil & gas, refinery, petrochemical, and offshore projects." },
+      {
+        property: "og:description",
+        content:
+          "EPC completions, punch list, mechanical completion, commissioning, and turnover management for oil & gas, refinery, petrochemical, and offshore projects.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Completions & Commissioning Pro" },
-      { name: "twitter:description", content: "EPC completions, punch list, mechanical completion, commissioning, and turnover management for oil & gas, refinery, petrochemical, and offshore projects." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1c1bf89a-a28d-4f84-8729-c958a4e47575" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1c1bf89a-a28d-4f84-8729-c958a4e47575" },
+      {
+        name: "twitter:description",
+        content:
+          "EPC completions, punch list, mechanical completion, commissioning, and turnover management for oil & gas, refinery, petrochemical, and offshore projects.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1c1bf89a-a28d-4f84-8729-c958a4e47575",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1c1bf89a-a28d-4f84-8729-c958a4e47575",
+      },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/favicon.ico" },
     ],
   }),
   shellComponent: RootShell,

@@ -5,10 +5,10 @@ import { Plus, Menu, X } from "lucide-react";
 import { SidebarBody } from "./AppSidebar";
 
 export function TopBar() {
-  const pathname = useRouterState({ select: r => r.location.pathname });
-  const projects = useStore(s => s.projects);
-  const activeId = useStore(s => s.activeProjectId);
-  const active = projects.find(p => p.id === activeId);
+  const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const projects = useStore((s) => s.projects);
+  const activeId = useStore((s) => s.activeProjectId);
+  const active = projects.find((p) => p.id === activeId);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Build readable breadcrumbs: replace project IDs with project name
@@ -32,7 +32,9 @@ export function TopBar() {
         </button>
 
         <div className="flex items-center gap-1.5 text-sm min-w-0 flex-1 overflow-hidden">
-          <Link to="/" className="text-muted-foreground hover:text-foreground shrink-0">Home</Link>
+          <Link to="/" className="text-muted-foreground hover:text-foreground shrink-0">
+            Home
+          </Link>
           {crumbs.map((c, i) => (
             <span key={i} className="flex items-center gap-1.5 min-w-0">
               <span className="text-muted-foreground/50 shrink-0">/</span>
@@ -63,7 +65,10 @@ export function TopBar() {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-72 shadow-xl" onClick={() => setMobileOpen(false)}>
+          <div
+            className="absolute left-0 top-0 bottom-0 w-72 shadow-xl"
+            onClick={() => setMobileOpen(false)}
+          >
             <SidebarBody />
           </div>
         </div>

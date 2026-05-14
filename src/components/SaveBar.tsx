@@ -23,14 +23,21 @@ interface SaveBarProps {
  *  - TanStack Router navigation blocker with Save / Discard / Cancel dialog
  *  - window beforeunload guard for tab close / refresh
  */
-export function SaveBar({ isDirty, lastSaved, onSave, onDiscard, moduleLabel = "this module", disabled }: SaveBarProps) {
+export function SaveBar({
+  isDirty,
+  lastSaved,
+  onSave,
+  onDiscard,
+  moduleLabel = "this module",
+  disabled,
+}: SaveBarProps) {
   const [tick, setTick] = useState(0);
   const [saving, setSaving] = useState(false);
 
   // Refresh "Saved Xs ago" once a second while not dirty.
   useEffect(() => {
     if (isDirty || !lastSaved) return;
-    const id = setInterval(() => setTick(t => t + 1), 1000);
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(id);
   }, [isDirty, lastSaved]);
 
@@ -70,7 +77,7 @@ export function SaveBar({ isDirty, lastSaved, onSave, onDiscard, moduleLabel = "
           "sticky bottom-3 z-30 mt-4 flex flex-wrap items-center gap-2 rounded-lg border px-3 py-2 shadow-lg backdrop-blur transition-colors sm:gap-3 sm:px-4 sm:py-2.5",
           isDirty
             ? "border-warning/50 bg-warning/95 text-warning-foreground"
-            : "border-border bg-card/95"
+            : "border-border bg-card/95",
         )}
         role="region"
         aria-label="Form save status"
@@ -90,8 +97,12 @@ export function SaveBar({ isDirty, lastSaved, onSave, onDiscard, moduleLabel = "
             disabled={!isDirty || saving}
             className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed sm:px-4"
           >
-            {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-            {saving ? "Saving…" : "Save"}
+            {saving ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Save className="h-3.5 w-3.5" />
+            )}
+            {saving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>
@@ -114,7 +125,15 @@ export function SaveBar({ isDirty, lastSaved, onSave, onDiscard, moduleLabel = "
   );
 }
 
-function StatusPill({ isDirty, lastSaved, tick }: { isDirty: boolean; lastSaved: Date | null; tick: number }) {
+function StatusPill({
+  isDirty,
+  lastSaved,
+  tick,
+}: {
+  isDirty: boolean;
+  lastSaved: Date | null;
+  tick: number;
+}) {
   void tick;
   if (isDirty) {
     return (
@@ -129,7 +148,9 @@ function StatusPill({ isDirty, lastSaved, tick }: { isDirty: boolean; lastSaved:
     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-success">
       <Check className="h-3.5 w-3.5" />
       All changes saved
-      {savedTxt && <span className="hidden sm:inline text-muted-foreground font-normal">· {savedTxt}</span>}
+      {savedTxt && (
+        <span className="hidden sm:inline text-muted-foreground font-normal">/ {savedTxt}</span>
+      )}
     </span>
   );
 }
@@ -158,9 +179,13 @@ function UnsavedDialog({
             <AlertCircle className="h-5 w-5" />
           </div>
           <div className="flex-1">
-            <h3 id="unsaved-title" className="text-lg font-bold">Unsaved changes</h3>
+            <h3 id="unsaved-title" className="text-lg font-bold">
+              Unsaved changes
+            </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              You have unsaved changes in <span className="font-semibold text-foreground">{moduleLabel}</span>. What would you like to do before leaving?
+              You have unsaved changes in{" "}
+              <span className="font-semibold text-foreground">{moduleLabel}</span>. What would you
+              like to do before leaving?
             </p>
           </div>
         </div>
