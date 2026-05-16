@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { COMM_CHECK_KEYS, MC_CHECK_KEYS, TURNOVER_CHECK_KEYS } from "./types";
+import {
+  COMM_CHECK_KEYS,
+  MC_CHECK_KEYS,
+  RELIABILITY_CHECK_KEYS,
+  STARTUP_CHECK_KEYS,
+  TURNOVER_CHECK_KEYS,
+} from "./types";
 
 export const APP_DATA_VERSION = 5;
 
@@ -146,6 +152,8 @@ export const SubsystemSchema = z.object({
   mcChecks: optionalBooleanMap(MC_CHECK_KEYS).optional(),
   commChecks: optionalBooleanMap(COMM_CHECK_KEYS).optional(),
   turnoverChecks: optionalBooleanMap(TURNOVER_CHECK_KEYS).optional(),
+  startupChecks: optionalBooleanMap(STARTUP_CHECK_KEYS).optional(),
+  reliabilityChecks: optionalBooleanMap(RELIABILITY_CHECK_KEYS).optional(),
   preservation: z
     .object({
       interval: z.number().int().min(0),

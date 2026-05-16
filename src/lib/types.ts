@@ -125,9 +125,19 @@ export const COMM_CHECK_KEYS = [
   "reliability",
 ] as const;
 export const TURNOVER_CHECK_KEYS = ["mc", "rfsu", "commComplete", "opsAccept", "ccc"] as const;
+export const STARTUP_CHECK_KEYS = ["firstFeed", "stableOps", "safeguards", "opsStaffed"] as const;
+export const RELIABILITY_CHECK_KEYS = [
+  "runStarted",
+  "atDesignRate",
+  "noTrips",
+  "noCriticalPunches",
+  "ownerAccepted",
+] as const;
 export type MCCheckKey = (typeof MC_CHECK_KEYS)[number];
 export type CommCheckKey = (typeof COMM_CHECK_KEYS)[number];
 export type TurnoverCheckKey = (typeof TURNOVER_CHECK_KEYS)[number];
+export type StartupCheckKey = (typeof STARTUP_CHECK_KEYS)[number];
+export type ReliabilityCheckKey = (typeof RELIABILITY_CHECK_KEYS)[number];
 
 export interface Subsystem {
   id: string;
@@ -142,6 +152,8 @@ export interface Subsystem {
   mcChecks?: Partial<Record<MCCheckKey, boolean>>;
   commChecks?: Partial<Record<CommCheckKey, boolean>>;
   turnoverChecks?: Partial<Record<TurnoverCheckKey, boolean>>;
+  startupChecks?: Partial<Record<StartupCheckKey, boolean>>;
+  reliabilityChecks?: Partial<Record<ReliabilityCheckKey, boolean>>;
   preservation?: { interval: number; lastDone?: string; notes?: string };
   notes?: string;
 }

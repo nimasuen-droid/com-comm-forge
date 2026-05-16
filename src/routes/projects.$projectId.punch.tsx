@@ -96,8 +96,9 @@ function PunchPage() {
     form.setDraft((punches) => [np, ...punches]);
   };
   const handleSave = () => {
-    replacePunches(project.id, form.draft);
-    form.commit();
+    const next = form.getDraft();
+    replacePunches(project.id, next);
+    form.commit(next);
   };
 
   const [q, setQ] = useState("");

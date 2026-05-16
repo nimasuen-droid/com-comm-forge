@@ -45,8 +45,9 @@ function MCPage() {
   };
 
   const handleSave = () => {
-    const tempProject = { ...project, systems: form.draft };
-    const next = form.draft.map((sys) => ({
+    const draft = form.getDraft();
+    const tempProject = { ...project, systems: draft };
+    const next = draft.map((sys) => ({
       ...sys,
       subsystems: sys.subsystems.map((ss) => ({
         ...ss,

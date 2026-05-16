@@ -1,6 +1,6 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
+import { Link, createFileRoute, useParams } from "@tanstack/react-router";
 import { useProject } from "@/lib/store";
-import { deriveWorkflow } from "@/lib/derive";
+import { deriveWorkflow, workflowEvidence } from "@/lib/derive";
 import { PercentBar } from "@/components/StatusBits";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
@@ -36,11 +36,13 @@ const steps = [
     key: "startup",
     label: "Start-up",
     desc: "First feed introduction, transition to operating conditions.",
+    sourcePath: "/projects/$projectId/commissioning",
   },
   {
     key: "reliability",
     label: "Reliability Run",
     desc: "Continuous operation at design — typically 72 hr to 7 days.",
+    sourcePath: "/projects/$projectId/commissioning",
   },
   {
     key: "handover",
@@ -53,6 +55,7 @@ function WorkflowPage() {
   const { projectId } = useParams({ from: "/projects/$projectId" });
   const project = useProject(projectId)!;
   const wf = deriveWorkflow(project);
+  const evidence = workflowEvidence(project);
 
   return (
     <div className="space-y-5">
@@ -62,7 +65,7 @@ function WorkflowPage() {
           <GitBranch className="h-5 w-5 text-accent" /> Workflow Engine
         </h2>
         <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-          Auto-derived from MC, Commissioning & Turnover modules
+          Auto-derived from MC, Commissioning, Start-up, Reliability & Turnover modules
         </span>
       </div>
 
@@ -70,6 +73,7 @@ function WorkflowPage() {
         <div className="flex items-center gap-2 overflow-x-auto pb-2">
           {steps.map((s, i) => {
             const v = wf[s.key];
+            const ev = evidence[s.key];
             return (
               <div key={s.key} className="flex items-center gap-2 shrink-0">
                 <div className="rounded-md border border-border bg-card px-3 py-2 min-w-44">
@@ -83,7 +87,12 @@ function WorkflowPage() {
                       tone={v >= 80 ? "success" : v >= 40 ? "warning" : "destructive"}
                     />
                   </div>
-                  <div className="text-[10px] mt-1 text-muted-foreground tabular-nums">{v}%</div>
+                  <div className="mt-1 flex items-center justify-between gap-2 text-[10px] text-muted-foreground">
+                    <span className="tabular-nums">{v}%</span>
+                    <span className="tabular-nums">
+                      {ev.done}/{ev.total}
+                    </span>
+                  </div>
                 </div>
                 {i < steps.length - 1 && (
                   <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -100,6 +109,18 @@ function WorkflowPage() {
             <div className="md:col-span-4">
               <div className="font-semibold text-sm">{s.label}</div>
               <div className="text-xs text-muted-foreground">{s.desc}</div>
+              <div className="mt-1 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                {evidence[s.key].source} · {evidence[s.key].done}/{evidence[s.key].total} complete
+              </div>
+              {"sourcePath" in s && (
+                <Link
+                  to={s.sourcePath}
+                  params={{ projectId: project.id }}
+                  className="mt-2 inline-flex text-xs font-semibold text-primary hover:underline"
+                >
+                  Open tracking table
+                </Link>
+              )}
             </div>
             <div className="md:col-span-7">
               <PercentBar value={wf[s.key]} tone="primary" />
@@ -117,7 +138,8 @@ function WorkflowPage() {
         why={
           <>
             Percentages here are <b>derived live</b> from the per-subsystem MC, Commissioning, and
-            Turnover checklists. To advance a step, tick the underlying gates in those modules.
+            Turnover checklists, plus the Start-up Tracking and Reliability Run Tracking tables on
+            the Commissioning page. To advance a step, tick the underlying gates in those modules.
           </>
         }
         problems={

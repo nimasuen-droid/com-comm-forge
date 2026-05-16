@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type SetStateAction } from "react";
 
 /**
  * Generic draft-state hook for explicit Save / Discard UX.
@@ -15,10 +15,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * has no pending edits, so it stays in sync with upstream store updates.
  */
 export function useDirtyForm<T>(initial: T) {
-  const [draft, setDraft] = useState<T>(initial);
+  const [draft, setDraftState] = useState<T>(initial);
   const [baseline, setBaseline] = useState<T>(initial);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const initialRef = useRef(initial);
+  const draftRef = useRef(initial);
 
   const isDirty = JSON.stringify(draft) !== JSON.stringify(baseline);
 
@@ -28,39 +29,59 @@ export function useDirtyForm<T>(initial: T) {
     if (initial === initialRef.current) return;
     initialRef.current = initial;
     if (!isDirty) {
-      setDraft(initial);
+      draftRef.current = initial;
+      setDraftState(initial);
       setBaseline(initial);
     }
     // Intentionally only react to `initial` reference changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial]);
 
+  const setDraft = useCallback((next: SetStateAction<T>) => {
+    const value = typeof next === "function" ? (next as (value: T) => T)(draftRef.current) : next;
+    draftRef.current = value;
+    setDraftState(value);
+  }, []);
+
   const markSaved = useCallback(() => {
-    setBaseline(draft);
+    setBaseline(draftRef.current);
     setLastSaved(new Date());
-  }, [draft]);
+  }, []);
 
   const discard = useCallback(() => {
-    setDraft(baseline);
+    draftRef.current = baseline;
+    setDraftState(baseline);
   }, [baseline]);
 
   const reset = useCallback((next: T) => {
-    setDraft(next);
+    draftRef.current = next;
+    setDraftState(next);
     setBaseline(next);
   }, []);
 
   /** Promote a (possibly externally-recomputed) value to the new baseline + draft and stamp lastSaved. */
-  const commit = useCallback(
-    (next?: T) => {
-      const v = (next ?? draft) as T;
-      setDraft(v);
-      setBaseline(v);
-      setLastSaved(new Date());
-    },
-    [draft],
-  );
+  const commit = useCallback((next?: T) => {
+    const v = (next ?? draftRef.current) as T;
+    draftRef.current = v;
+    setDraftState(v);
+    setBaseline(v);
+    setLastSaved(new Date());
+  }, []);
 
-  return { draft, setDraft, baseline, isDirty, lastSaved, markSaved, discard, reset, commit };
+  const getDraft = useCallback(() => draftRef.current, []);
+
+  return {
+    draft,
+    setDraft,
+    getDraft,
+    baseline,
+    isDirty,
+    lastSaved,
+    markSaved,
+    discard,
+    reset,
+    commit,
+  };
 }
 
 /** Format a saved-at timestamp for the SaveBar status pill. Returns empty string when never saved. */

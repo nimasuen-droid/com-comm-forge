@@ -12,7 +12,7 @@ import type {
   Subsystem,
   UserRole,
 } from "./types";
-import { deriveMcStatus, deriveCommStatus, deriveTurnoverStatus } from "./derive";
+import { deriveMcStatus, deriveRfsuStatus, deriveCommStatus, deriveTurnoverStatus } from "./derive";
 import { APP_DATA_VERSION } from "./projectSchema";
 import {
   DEFAULT_COMPLIANCE_POLICY,
@@ -92,7 +92,9 @@ function appendAudit(project: Project, drafts: AuditDraft | AuditDraft[]): Proje
     return [...events, { ...base, hash: auditHash(base) }];
   }, []);
 
-  return touchProject({ ...project, auditLog: [...existing, ...nextEvents] });
+  return touchProject(
+    recalculateProjectStatuses({ ...project, auditLog: [...existing, ...nextEvents] }),
+  );
 }
 
 function entity(type: EntityRef["type"], id: string): EntityRef {
@@ -102,6 +104,23 @@ function entity(type: EntityRef["type"], id: string): EntityRef {
 function booleanMapValue(value: unknown, key: string) {
   if (!value || typeof value !== "object") return false;
   return Boolean((value as Record<string, boolean | undefined>)[key]);
+}
+
+function recalculateProjectStatuses(project: Project): Project {
+  const base: Project = { ...project };
+  return {
+    ...project,
+    systems: project.systems.map((sys) => ({
+      ...sys,
+      subsystems: sys.subsystems.map((ss) => ({
+        ...ss,
+        mcStatus: deriveMcStatus(base, sys, ss),
+        rfsuStatus: deriveRfsuStatus(base, sys, ss),
+        commStatus: deriveCommStatus(base, sys, ss),
+        turnoverStatus: deriveTurnoverStatus(base, sys, ss),
+      })),
+    })),
+  };
 }
 
 function diffSubsystems(before: SystemNode[], after: SystemNode[]): AuditDraft[] {
@@ -153,7 +172,9 @@ function diffSubsystems(before: SystemNode[], after: SystemNode[]): AuditDraft[]
         }
       });
 
-      (["mcChecks", "commChecks", "turnoverChecks"] as const).forEach((field) => {
+      (
+        ["mcChecks", "commChecks", "turnoverChecks", "startupChecks", "reliabilityChecks"] as const
+      ).forEach((field) => {
         const keys = new Set([
           ...Object.keys(oldSubsystem[field] ?? {}),
           ...Object.keys(subsystem[field] ?? {}),

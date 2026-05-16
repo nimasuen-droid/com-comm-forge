@@ -1,8 +1,23 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useProject, useStore } from "@/lib/store";
 import { ragColor } from "@/lib/kpi";
-import { commProgress, COMM_CHECK_LABELS, deriveCommStatus } from "@/lib/derive";
-import { COMM_CHECK_KEYS, type CommCheckKey } from "@/lib/types";
+import {
+  commProgress,
+  reliabilityProgress,
+  startupProgress,
+  COMM_CHECK_LABELS,
+  RELIABILITY_CHECK_LABELS,
+  STARTUP_CHECK_LABELS,
+} from "@/lib/derive";
+import {
+  COMM_CHECK_KEYS,
+  RELIABILITY_CHECK_KEYS,
+  STARTUP_CHECK_KEYS,
+  type CommCheckKey,
+  type ReliabilityCheckKey,
+  type StartupCheckKey,
+  type SystemNode,
+} from "@/lib/types";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
@@ -51,15 +66,53 @@ function CommPage() {
     );
   };
 
+  const setStartupCheck = (sysId: string, subId: string, key: StartupCheckKey, value: boolean) => {
+    form.setDraft((systems) =>
+      systems.map((sys) =>
+        sys.id !== sysId
+          ? sys
+          : {
+              ...sys,
+              subsystems: sys.subsystems.map((ss) =>
+                ss.id !== subId
+                  ? ss
+                  : {
+                      ...ss,
+                      startupChecks: { ...(ss.startupChecks ?? {}), [key]: value },
+                    },
+              ),
+            },
+      ),
+    );
+  };
+
+  const setReliabilityCheck = (
+    sysId: string,
+    subId: string,
+    key: ReliabilityCheckKey,
+    value: boolean,
+  ) => {
+    form.setDraft((systems) =>
+      systems.map((sys) =>
+        sys.id !== sysId
+          ? sys
+          : {
+              ...sys,
+              subsystems: sys.subsystems.map((ss) =>
+                ss.id !== subId
+                  ? ss
+                  : {
+                      ...ss,
+                      reliabilityChecks: { ...(ss.reliabilityChecks ?? {}), [key]: value },
+                    },
+              ),
+            },
+      ),
+    );
+  };
+
   const handleSave = () => {
-    const tempProject = { ...project, systems: form.draft };
-    const next = form.draft.map((sys) => ({
-      ...sys,
-      subsystems: sys.subsystems.map((ss) => ({
-        ...ss,
-        commStatus: deriveCommStatus(tempProject, sys, ss),
-      })),
-    }));
+    const next = form.getDraft();
     replaceSystems(project.id, next);
     form.commit(next);
   };
@@ -166,6 +219,30 @@ function CommPage() {
         </table>
       </div>
 
+      <ChecklistTable
+        title="Start-up Tracking"
+        subtitle="First feed, stable operations, safeguards, and shift coverage"
+        keys={STARTUP_CHECK_KEYS}
+        labels={STARTUP_CHECK_LABELS}
+        systems={form.draft}
+        progressFor={startupProgress}
+        checkedFor={(ss, key) => !!ss.startupChecks?.[key]}
+        onToggle={setStartupCheck}
+        tone="warning"
+      />
+
+      <ChecklistTable
+        title="Reliability Run Tracking"
+        subtitle="Contractual run readiness and owner acceptance"
+        keys={RELIABILITY_CHECK_KEYS}
+        labels={RELIABILITY_CHECK_LABELS}
+        systems={form.draft}
+        progressFor={reliabilityProgress}
+        checkedFor={(ss, key) => !!ss.reliabilityChecks?.[key]}
+        onToggle={setReliabilityCheck}
+        tone="success"
+      />
+
       <WeightingBasis project={project} module="comm" />
 
       <SaveBar
@@ -212,6 +289,89 @@ function CommPage() {
         }}
         dependency={{ to: "/projects/$projectId/mc", projectId: project.id, label: "MC Complete" }}
       />
+    </div>
+  );
+}
+
+function ChecklistTable<K extends string>({
+  title,
+  subtitle,
+  keys,
+  labels,
+  systems,
+  progressFor,
+  checkedFor,
+  onToggle,
+  tone,
+}: {
+  title: string;
+  subtitle: string;
+  keys: readonly K[];
+  labels: Record<K, string>;
+  systems: SystemNode[];
+  progressFor: (ss: SystemNode["subsystems"][number]) => { pct: number };
+  checkedFor: (ss: SystemNode["subsystems"][number], key: K) => boolean;
+  onToggle: (sysId: string, subId: string, key: K, value: boolean) => void;
+  tone: "success" | "warning";
+}) {
+  return (
+    <div className="panel overflow-x-auto">
+      <div className="border-b border-border p-4">
+        <h3 className="font-semibold">{title}</h3>
+        <p className="text-xs text-muted-foreground">{subtitle}</p>
+      </div>
+      <table className="w-full min-w-[760px] text-sm">
+        <thead className="bg-muted/30 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          <tr>
+            <th className="text-left px-4 py-3">Subsystem</th>
+            {keys.map((key, index) => (
+              <th key={key} className="px-2 py-3 text-center">
+                {index + 1}. {labels[key]}
+              </th>
+            ))}
+            <th className="px-2 py-3 text-center">Progress</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {systems.flatMap((sys) =>
+            sys.subsystems.map((ss) => {
+              const { pct } = progressFor(ss);
+              return (
+                <tr key={`${title}-${ss.id}`} className="hover:bg-muted/20">
+                  <td className="px-4 py-3">
+                    <div className="font-medium">{ss.name}</div>
+                    <div className="text-xs text-muted-foreground font-mono">
+                      {sys.code} / {ss.code}
+                    </div>
+                  </td>
+                  {keys.map((key) => {
+                    const checked = checkedFor(ss, key);
+                    return (
+                      <td key={key} className="px-2 py-3 text-center">
+                        <button
+                          onClick={() => onToggle(sys.id, ss.id, key, !checked)}
+                          title={labels[key]}
+                          className={cn(
+                            "inline-flex h-6 w-6 items-center justify-center rounded border transition",
+                            checked
+                              ? tone === "success"
+                                ? "bg-success border-success text-success-foreground"
+                                : "bg-warning border-warning text-warning-foreground"
+                              : "border-border bg-background hover:bg-muted/40",
+                          )}
+                        >
+                          {checked && <Check className="h-3.5 w-3.5" />}
+                        </button>
+                      </td>
+                    );
+                  })}
+                  <td className="px-2 py-3 text-center text-xs font-bold tabular-nums">{pct}%</td>
+                </tr>
+              );
+            }),
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }

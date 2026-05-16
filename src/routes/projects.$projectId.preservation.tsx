@@ -44,8 +44,9 @@ function PresPage() {
   };
 
   const handleSave = () => {
-    replaceSystems(project.id, form.draft);
-    form.commit();
+    const next = form.getDraft();
+    replaceSystems(project.id, next);
+    form.commit(next);
   };
 
   const items = form.draft.flatMap((sys) => sys.subsystems.map((ss) => ({ sys, ss })));

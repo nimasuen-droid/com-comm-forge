@@ -79,8 +79,9 @@ function SystemsPage() {
   };
 
   const handleSave = () => {
-    replaceSystems(project.id, form.draft);
-    form.commit();
+    const next = form.getDraft();
+    replaceSystems(project.id, next);
+    form.commit(next);
   };
 
   const [open, setOpen] = useState<Record<string, boolean>>(

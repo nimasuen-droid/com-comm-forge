@@ -74,8 +74,9 @@ function DocsPage() {
   };
   const removeDoc = (id: string) => form.setDraft((docs) => docs.filter((d) => d.id !== id));
   const handleSave = () => {
-    updateProject(project.id, { documents: form.draft });
-    form.commit();
+    const next = form.getDraft();
+    updateProject(project.id, { documents: next });
+    form.commit(next);
   };
 
   const visualReports = [
