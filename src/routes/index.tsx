@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { ComponentProps } from "react";
 import { useStore } from "@/lib/store";
-import { projectKpis } from "@/lib/kpi";
+import { pctRag, projectKpis } from "@/lib/kpi";
 import { PercentBar } from "@/components/StatusBits";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import {
@@ -13,6 +13,7 @@ import {
   Zap,
   ArrowRight,
   Gauge,
+  HardDrive,
 } from "lucide-react";
 
 type ProgressTone = ComponentProps<typeof PercentBar>["tone"];
@@ -70,6 +71,26 @@ function Dashboard() {
         >
           Manage Projects <ArrowRight className="h-4 w-4" />
         </Link>
+      </div>
+
+      <div className="panel border-primary/25 bg-primary/5 p-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <HardDrive className="h-4 w-4 text-primary" /> Local hard-drive records
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Save every project to a local folder with an app restore file plus workbook/CSV owner
+              records, or load a project back from that folder.
+            </p>
+          </div>
+          <Link
+            to="/projects"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+          >
+            Manage records <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -154,10 +175,10 @@ function Dashboard() {
                   </div>
 
                   <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Mini label="MC" value={k.mcPct} tone="success" />
-                    <Mini label="RFSU" value={k.rfsuPct} tone="warning" />
-                    <Mini label="Commissioning" value={k.commPct} tone="primary" />
-                    <Mini label="Handover" value={k.handoverPct} tone="accent" />
+                    <Mini label="MC" value={k.mcPct} />
+                    <Mini label="RFSU" value={k.rfsuPct} />
+                    <Mini label="Commissioning" value={k.commPct} />
+                    <Mini label="Handover" value={k.handoverPct} />
                   </div>
 
                   <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground font-mono">
@@ -272,17 +293,33 @@ function KpiTile({
   );
 }
 
-function Mini({ label, value, tone }: { label: string; value: number; tone: ProgressTone }) {
+function Mini({ label, value }: { label: string; value: number }) {
+  const rag = pctRag(value);
+  const toneByStatus: Record<string, ProgressTone> = {
+    green: "success",
+    amber: "warning",
+    red: "destructive",
+    grey: "muted",
+  };
+  const badgeByStatus: Record<string, string> = {
+    green: "bg-success text-success-foreground",
+    amber: "bg-warning text-warning-foreground",
+    red: "bg-destructive text-destructive-foreground",
+    grey: "bg-muted text-white",
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground font-mono uppercase tracking-wider text-[10px]">
           {label}
         </span>
-        <span className="font-bold tabular-nums">{value}%</span>
+        <span className={`rounded px-1.5 py-0.5 font-bold tabular-nums ${badgeByStatus[rag]}`}>
+          {value}%
+        </span>
       </div>
       <div className="mt-1.5">
-        <PercentBar value={value} tone={tone} />
+        <PercentBar value={value} tone={toneByStatus[rag]} />
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import {
   TURNOVER_CHECK_KEYS,
 } from "./types";
 
-export const APP_DATA_VERSION = 5;
+export const APP_DATA_VERSION = 6;
 
 const DisciplineSchema = z.enum([
   "Piping",
@@ -223,6 +223,14 @@ const CompliancePolicySchema = z.object({
   }),
 });
 
+const RecordsArchiveSchema = z.object({
+  folderName: z.string().min(1),
+  appFileName: z.string().min(1),
+  userFiles: z.array(z.string().min(1)),
+  lastSavedAt: isoDateString,
+  mode: z.enum(["folder", "download"]),
+});
+
 export const ProjectSchema = z.object({
   id: z.string().min(1),
   orgId: z.string().optional(),
@@ -246,6 +254,7 @@ export const ProjectSchema = z.object({
   auditLog: z.array(AuditEventSchema).optional(),
   signatures: z.array(SignatureRecordSchema).optional(),
   compliancePolicy: CompliancePolicySchema.optional(),
+  recordsArchive: RecordsArchiveSchema.optional(),
   progressWeights: ProgressWeightsSchema.optional(),
 });
 

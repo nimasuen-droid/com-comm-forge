@@ -4,7 +4,7 @@ export const ragColor: Record<RAG, string> = {
   red: "bg-destructive text-destructive-foreground",
   amber: "bg-warning text-warning-foreground",
   green: "bg-success text-success-foreground",
-  grey: "bg-muted text-muted-foreground",
+  grey: "bg-muted text-white",
 };
 
 export const ragDot: Record<RAG, string> = {
@@ -12,6 +12,13 @@ export const ragDot: Record<RAG, string> = {
   amber: "bg-warning",
   green: "bg-success",
   grey: "bg-muted-foreground/40",
+};
+
+export const ragTextColor: Record<RAG, string> = {
+  red: "text-destructive",
+  amber: "text-warning",
+  green: "text-success",
+  grey: "text-white",
 };
 
 const ragScore: Record<RAG, number> = { green: 100, amber: 50, red: 10, grey: 0 };

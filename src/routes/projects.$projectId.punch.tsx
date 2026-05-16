@@ -22,6 +22,7 @@ import {
   ClipboardCheck,
   Clock,
   X,
+  MoreHorizontal,
 } from "lucide-react";
 import type { Discipline, PunchCategory, PunchItem, PunchStatus, SystemNode } from "@/lib/types";
 import { exportPunchRegister } from "@/lib/exports";
@@ -374,30 +375,34 @@ function PunchPage() {
                 <option value="in_progress">In progress</option>
                 <option value="closed">Closed</option>
               </select>
-              {p.status === "closed" ? (
-                <button
-                  onClick={() => upd(p.id, { status: "open" })}
-                  title="Reopen"
-                  className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-muted/50"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => upd(p.id, { status: "closed" })}
-                  title="Close"
-                  className="h-8 w-8 rounded-md border border-success/40 text-success flex items-center justify-center hover:bg-success/10"
-                >
-                  <Check className="h-3.5 w-3.5" />
-                </button>
-              )}
-              <button
-                onClick={() => del(p.id)}
-                title="Delete"
-                className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-destructive/20 hover:text-destructive"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              <details className="relative">
+                <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-md border border-border hover:bg-muted/50 [&::-webkit-details-marker]:hidden">
+                  <MoreHorizontal className="h-3.5 w-3.5" />
+                </summary>
+                <div className="absolute right-0 z-20 mt-2 w-40 rounded-md border border-border bg-card p-1 shadow-lg">
+                  {p.status === "closed" ? (
+                    <button
+                      onClick={() => upd(p.id, { status: "open" })}
+                      className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-xs hover:bg-muted/50"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" /> Reopen
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => upd(p.id, { status: "closed" })}
+                      className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-xs hover:bg-muted/50"
+                    >
+                      <Check className="h-3.5 w-3.5" /> Close
+                    </button>
+                  )}
+                  <button
+                    onClick={() => del(p.id)}
+                    className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-xs text-destructive hover:bg-destructive/15"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Delete
+                  </button>
+                </div>
+              </details>
             </div>
           );
         })}

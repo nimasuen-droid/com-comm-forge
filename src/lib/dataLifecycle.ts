@@ -113,6 +113,7 @@ export function normalizeProject(input: unknown): Project {
     auditLog: legacyAuditLog(raw.auditLog, id),
     signatures: legacySignatures(raw.signatures),
     compliancePolicy: { ...DEFAULT_COMPLIANCE_POLICY, ...asRecord(raw.compliancePolicy) },
+    recordsArchive: raw.recordsArchive,
   };
 
   const parsed = ProjectSchema.safeParse(candidate);

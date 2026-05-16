@@ -29,6 +29,7 @@ import {
   Presentation,
   FileImage,
   ScrollText,
+  MoreHorizontal,
 } from "lucide-react";
 
 export const Route = createFileRoute("/projects/$projectId/documents")({
@@ -218,12 +219,19 @@ function DocsPage() {
                   {sys ? ` · ${sys.code}` : ""} · {new Date(d.uploadedAt).toLocaleDateString()}
                 </div>
               </div>
-              <button
-                onClick={() => removeDoc(d.id)}
-                className="h-8 w-8 rounded-md border border-border flex items-center justify-center hover:bg-destructive/20 hover:text-destructive"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
+              <details className="relative self-end sm:self-auto">
+                <summary className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-md border border-border hover:bg-muted/50 [&::-webkit-details-marker]:hidden">
+                  <MoreHorizontal className="h-3.5 w-3.5" />
+                </summary>
+                <div className="absolute right-0 z-20 mt-2 w-36 rounded-md border border-border bg-card p-1 shadow-lg">
+                  <button
+                    onClick={() => removeDoc(d.id)}
+                    className="flex w-full items-center gap-2 rounded px-2 py-2 text-left text-xs text-destructive hover:bg-destructive/15"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Delete
+                  </button>
+                </div>
+              </details>
             </div>
           );
         })}

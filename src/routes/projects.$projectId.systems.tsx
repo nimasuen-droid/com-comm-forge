@@ -1,7 +1,7 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useState } from "react";
 import { useStore, useProject } from "@/lib/store";
-import { ragDot } from "@/lib/kpi";
+import { ragTextColor } from "@/lib/kpi";
 import { EngineeringInsight } from "@/components/EngineeringInsight";
 import { LearnRail } from "@/components/LearnCard";
 import { WorkflowNav } from "@/components/WorkflowNav";
@@ -263,7 +263,10 @@ function SystemsPage() {
                             onChange={(e) =>
                               updateSubsystem(sys.id, ss.id, { [k]: e.target.value as RAG })
                             }
-                            className="bg-transparent border border-border rounded px-1 py-0.5 text-xs"
+                            className={cn(
+                              "bg-transparent border border-border rounded px-1 py-0.5 text-xs font-semibold",
+                              ragTextColor[ss[k]],
+                            )}
                           >
                             {rags.map((r) => (
                               <option key={r} value={r}>

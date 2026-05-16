@@ -6,6 +6,7 @@ import type {
   DocumentItem,
   EntityRef,
   Project,
+  RecordsArchive,
   PunchItem,
   SignatureRecord,
   SystemNode,
@@ -493,8 +494,11 @@ interface State {
   archiveProject: (id: string, archived: boolean) => void;
   deleteProject: (id: string) => void;
   importProject: (p: Project) => void;
+  loadProject: (p: Project) => void;
+  overwriteProjectFromArchive: (projectId: string, source: Project) => void;
   setActive: (id: string | null) => void;
   updateProject: (id: string, patch: Partial<Project>) => void;
+  recordRecordsArchive: (id: string, archive: RecordsArchive) => void;
 
   addSystem: (projectId: string, sys: Omit<SystemNode, "id" | "subsystems">) => void;
   updateSystem: (projectId: string, sysId: string, patch: Partial<SystemNode>) => void;
@@ -651,7 +655,90 @@ export const useStore = create<State>()(
             ),
           ],
         }),
+      loadProject: (p) => {
+        const loaded = normalizeProject({
+          ...p,
+          syncStatus: "local",
+          updatedBy: LOCAL_ACTOR.id,
+        });
+        set({
+          activeProjectId: loaded.id,
+          projects: get().projects.some((project) => project.id === loaded.id)
+            ? get().projects.map((project) =>
+                project.id === loaded.id
+                  ? appendAudit(loaded, {
+                      action: "import",
+                      entity: entity("project", loaded.id),
+                      source: "import",
+                      after: { name: loaded.name, sourceProjectId: loaded.id },
+                      reason: "Project record folder loaded",
+                    })
+                  : project,
+              )
+            : [
+                ...get().projects,
+                appendAudit(loaded, {
+                  action: "import",
+                  entity: entity("project", loaded.id),
+                  source: "import",
+                  after: { name: loaded.name, sourceProjectId: loaded.id },
+                  reason: "Project record folder loaded",
+                }),
+              ],
+        });
+      },
+      overwriteProjectFromArchive: (projectId, source) => {
+        const sourceProject = normalizeProject(source);
+        set({
+          activeProjectId: projectId,
+          projects: get().projects.map((p) =>
+            p.id === projectId
+              ? appendAudit(
+                  {
+                    ...sourceProject,
+                    id: projectId,
+                    createdAt: p.createdAt,
+                    createdBy: p.createdBy,
+                    updatedBy: LOCAL_ACTOR.id,
+                    syncStatus: "local",
+                    auditLog: p.auditLog ?? [],
+                  },
+                  {
+                    action: "import",
+                    entity: entity("project", projectId),
+                    source: "import",
+                    before: { name: p.name, sourceProjectId: p.id },
+                    after: { name: sourceProject.name, sourceProjectId: sourceProject.id },
+                    reason: "Selected project overwritten from local records archive",
+                  },
+                )
+              : p,
+          ),
+        });
+      },
       setActive: (id) => set({ activeProjectId: id }),
+      recordRecordsArchive: (id, archive) =>
+        set({
+          projects: get().projects.map((p) =>
+            p.id === id
+              ? appendAudit(
+                  {
+                    ...p,
+                    recordsArchive: archive,
+                    syncStatus: "synced",
+                    updatedBy: LOCAL_ACTOR.id,
+                  },
+                  {
+                    action: "export",
+                    entity: entity("project", p.id),
+                    source: "local",
+                    after: archive,
+                    reason: "Project records archive saved",
+                  },
+                )
+              : p,
+          ),
+        }),
 
       updateProject: (id, patch) =>
         set({

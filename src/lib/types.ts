@@ -211,6 +211,14 @@ export interface CompliancePolicy {
   };
 }
 
+export interface RecordsArchive {
+  folderName: string;
+  appFileName: string;
+  userFiles: string[];
+  lastSavedAt: string;
+  mode: "folder" | "download";
+}
+
 export interface Project {
   id: string;
   orgId?: string;
@@ -234,6 +242,7 @@ export interface Project {
   auditLog?: AuditEvent[];
   signatures?: SignatureRecord[];
   compliancePolicy?: CompliancePolicy;
+  recordsArchive?: RecordsArchive;
   /** Optional override of the global default progress weighting profile. */
   progressWeights?: {
     mc?: Partial<Record<MCCheckKey, number>>;
