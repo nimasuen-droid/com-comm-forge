@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { Plus, Menu, X } from "lucide-react";
 import { SidebarBody } from "./AppSidebar";
+import { InstallButton } from "./InstallButton";
 
 export function TopBar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
@@ -52,6 +53,7 @@ export function TopBar() {
             <span className="font-medium truncate max-w-[200px]">{active.name}</span>
           </div>
         )}
+        <InstallButton />
         <Link
           to="/projects"
           className="inline-flex items-center gap-1.5 rounded-md bg-primary px-2 sm:px-3 h-9 text-xs font-semibold text-primary-foreground hover:bg-primary/90 shrink-0"

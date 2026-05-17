@@ -1,15 +1,39 @@
 {
   "name": "Completions & Commissioning Pro",
   "short_name": "CC Pro",
-  "description": "Field execution workspace for EPC completions, punch, MC, commissioning, and turnover.",
+  "description": "Offline-capable field execution workspace for EPC completions, punch, MC, commissioning, and turnover.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0f1a2a",
   "theme_color": "#0f1a2a",
   "orientation": "any",
-  "categories": ["productivity", "business"],
+  "categories": ["productivity", "business", "utilities"],
   "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/favicon.ico",
       "sizes": "48x48 64x64 128x128 256x256",

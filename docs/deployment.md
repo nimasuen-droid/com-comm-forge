@@ -16,6 +16,7 @@ Local:
 
 - `.env` copied from `.env.example`
 - `APP_ENV=local`
+- `VITE_ENABLE_PWA=false` to avoid stale service-worker caches during local development.
 - Local persisted data remains in browser storage.
 
 Staging:
@@ -28,6 +29,7 @@ Production:
 
 - Cloudflare Worker env: `production`
 - Worker name: `ccpro-production`
+- `VITE_ENABLE_PWA=true` or unset so desktop browsers can install CC Pro for offline use. Set `VITE_ENABLE_PWA=false` only for emergency cache-disable releases.
 - Purpose: owner/client-facing release.
 
 Cloudflare secrets required in GitHub:
@@ -41,6 +43,15 @@ GitHub environment variables:
 - `PRODUCTION_URL`
 
 Runtime variables live in `wrangler.jsonc`. Secret provider keys such as `SENTRY_DSN` must be configured with `wrangler secret put` or GitHub environment secrets, never committed.
+
+## Offline Desktop Install
+
+The production build can be installed from Chrome or Edge as a standalone desktop app.
+
+- PWA install metadata lives in `public/manifest.webmanifest`.
+- Service-worker registration is guarded in `src/lib/pwa.ts`.
+- The header install button appears only after the browser fires `beforeinstallprompt`.
+- Project data remains local-first. Users should still save project records folders for durable owner records outside browser storage.
 
 ## CI
 

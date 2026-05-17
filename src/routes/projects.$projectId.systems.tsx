@@ -8,7 +8,7 @@ import { WorkflowNav } from "@/components/WorkflowNav";
 import { RagLegend } from "@/components/RagLegend";
 import { SaveBar } from "@/components/SaveBar";
 import { useDirtyForm } from "@/lib/useDirtyForm";
-import { Plus, ChevronRight, ChevronDown, Trash2, Search } from "lucide-react";
+import { Plus, ChevronRight, ChevronDown, Trash2, Search, Pencil } from "lucide-react";
 import type { Discipline, RAG, SystemPriority, SystemNode, Subsystem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -74,6 +74,9 @@ function SystemsPage() {
     const newSys: SystemNode = { id: uid(), subsystems: [], ...sys };
     form.setDraft((systems) => [...systems, newSys]);
   };
+  const updateSystem = (sysId: string, patch: Partial<SystemNode>) => {
+    form.setDraft((systems) => systems.map((s) => (s.id === sysId ? { ...s, ...patch } : s)));
+  };
   const deleteSystem = (sysId: string) => {
     form.setDraft((systems) => systems.filter((s) => s.id !== sysId));
   };
@@ -88,6 +91,11 @@ function SystemsPage() {
     Object.fromEntries(project.systems.map((s) => [s.id, true])),
   );
   const [showNewSys, setShowNewSys] = useState(false);
+  const [editingSystem, setEditingSystem] = useState<SystemNode | null>(null);
+  const [editingSubsystem, setEditingSubsystem] = useState<{
+    systemId: string;
+    subsystem: Subsystem;
+  } | null>(null);
   const [q, setQ] = useState("");
   const [disciplineFilter, setDisciplineFilter] = useState<Discipline | "all">("all");
   const [priorityFilter, setPriorityFilter] = useState<SystemPriority | "all">("all");
@@ -212,6 +220,12 @@ function SystemsPage() {
                 {sys.subsystems.length} subsystems
               </span>
               <button
+                onClick={() => setEditingSystem(sys)}
+                className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-semibold text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+              >
+                <Pencil className="h-3.5 w-3.5" /> Edit
+              </button>
+              <button
                 onClick={() => {
                   if (confirm("Delete system and all its subsystems? (Save to commit)"))
                     deleteSystem(sys.id);
@@ -277,10 +291,18 @@ function SystemsPage() {
                         </div>
                       ),
                     )}
-                    <div className="md:col-span-1 flex justify-end">
+                    <div className="md:col-span-1 flex justify-end gap-1">
+                      <button
+                        onClick={() => setEditingSubsystem({ systemId: sys.id, subsystem: ss })}
+                        className="text-muted-foreground hover:text-foreground p-1"
+                        aria-label={`Edit subsystem ${ss.code}`}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
                       <button
                         onClick={() => deleteSubsystem(sys.id, ss.id)}
                         className="text-muted-foreground hover:text-destructive p-1"
+                        aria-label={`Delete subsystem ${ss.code}`}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -295,11 +317,35 @@ function SystemsPage() {
       </div>
 
       {showNewSys && (
-        <NewSystemDialog
+        <SystemDialog
+          title="New System"
+          submitLabel="Create"
           onClose={() => setShowNewSys(false)}
           onAdd={(d) => {
             addSystem(d);
             setShowNewSys(false);
+          }}
+        />
+      )}
+      {editingSystem && (
+        <SystemDialog
+          title="Edit System"
+          submitLabel="Update"
+          initial={editingSystem}
+          onClose={() => setEditingSystem(null)}
+          onAdd={(d) => {
+            updateSystem(editingSystem.id, d);
+            setEditingSystem(null);
+          }}
+        />
+      )}
+      {editingSubsystem && (
+        <SubsystemDialog
+          initial={editingSubsystem.subsystem}
+          onClose={() => setEditingSubsystem(null)}
+          onSave={(patch) => {
+            updateSubsystem(editingSubsystem.systemId, editingSubsystem.subsystem.id, patch);
+            setEditingSubsystem(null);
           }}
         />
       )}
@@ -405,19 +451,25 @@ function AddSubsystemRow({ onAdd }: { onAdd: (d: NewSubsystemInput) => void }) {
   );
 }
 
-function NewSystemDialog({
+function SystemDialog({
+  title,
+  submitLabel,
+  initial,
   onClose,
   onAdd,
 }: {
+  title: string;
+  submitLabel: string;
+  initial?: SystemNode;
   onClose: () => void;
   onAdd: (d: NewSystemInput) => void;
 }) {
   const [f, setF] = useState({
-    name: "",
-    code: "",
-    description: "",
-    priority: "Medium" as SystemPriority,
-    ownerDiscipline: "Mechanical" as Discipline,
+    name: initial?.name ?? "",
+    code: initial?.code ?? "",
+    description: initial?.description ?? "",
+    priority: initial?.priority ?? ("Medium" as SystemPriority),
+    ownerDiscipline: initial?.ownerDiscipline ?? ("Mechanical" as Discipline),
   });
   return (
     <div
@@ -425,7 +477,7 @@ function NewSystemDialog({
       onClick={onClose}
     >
       <div className="panel max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold">New System</h3>
+        <h3 className="text-lg font-bold">{title}</h3>
         <div className="mt-4 grid gap-3">
           <input
             className="bg-input border border-border rounded-md px-3 py-2 text-sm"
@@ -478,7 +530,135 @@ function NewSystemDialog({
             onClick={() => onAdd(f)}
             className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
           >
-            Create
+            {submitLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SubsystemDialog({
+  initial,
+  onClose,
+  onSave,
+}: {
+  initial: Subsystem;
+  onClose: () => void;
+  onSave: (patch: Partial<Subsystem>) => void;
+}) {
+  const [f, setF] = useState({
+    name: initial.name,
+    code: initial.code,
+    discipline: initial.discipline,
+    tags: initial.tags.join(", "),
+    mcStatus: initial.mcStatus,
+    rfsuStatus: initial.rfsuStatus,
+    commStatus: initial.commStatus,
+    turnoverStatus: initial.turnoverStatus,
+    notes: initial.notes ?? "",
+  });
+  const tagList = f.tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+
+  return (
+    <div
+      className="fixed inset-0 z-40 bg-background/80 backdrop-blur flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div className="panel max-w-lg w-full p-6" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-bold">Edit Subsystem</h3>
+        <div className="mt-4 grid gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input
+              className="bg-input border border-border rounded-md px-3 py-2 text-sm"
+              placeholder="Subsystem code"
+              value={f.code}
+              onChange={(e) => setF({ ...f, code: e.target.value })}
+            />
+            <select
+              className="bg-input border border-border rounded-md px-3 py-2 text-sm"
+              value={f.discipline}
+              onChange={(e) => setF({ ...f, discipline: e.target.value as Discipline })}
+            >
+              {disciplines.map((d) => (
+                <option key={d}>{d}</option>
+              ))}
+            </select>
+          </div>
+          <input
+            className="bg-input border border-border rounded-md px-3 py-2 text-sm"
+            placeholder="Subsystem name"
+            value={f.name}
+            onChange={(e) => setF({ ...f, name: e.target.value })}
+          />
+          <input
+            className="bg-input border border-border rounded-md px-3 py-2 text-sm"
+            placeholder="Tags, separated by commas"
+            value={f.tags}
+            onChange={(e) => setF({ ...f, tags: e.target.value })}
+          />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {(
+              [
+                ["mcStatus", "MC"],
+                ["rfsuStatus", "RFSU"],
+                ["commStatus", "Comm"],
+                ["turnoverStatus", "Handover"],
+              ] as const
+            ).map(([key, label]) => (
+              <label key={key} className="grid gap-1 text-xs">
+                <span className="font-mono uppercase tracking-wider text-muted-foreground">
+                  {label}
+                </span>
+                <select
+                  className="bg-input border border-border rounded-md px-2 py-2 text-xs"
+                  value={f[key]}
+                  onChange={(e) => setF({ ...f, [key]: e.target.value as RAG })}
+                >
+                  {rags.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
+          <textarea
+            className="bg-input border border-border rounded-md px-3 py-2 text-sm min-h-20"
+            placeholder="Notes"
+            value={f.notes}
+            onChange={(e) => setF({ ...f, notes: e.target.value })}
+          />
+        </div>
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            onClick={onClose}
+            className="rounded-md border border-border px-4 py-2 text-sm hover:bg-muted/50"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!f.name || !f.code}
+            onClick={() =>
+              onSave({
+                name: f.name,
+                code: f.code,
+                discipline: f.discipline,
+                tags: tagList,
+                mcStatus: f.mcStatus,
+                rfsuStatus: f.rfsuStatus,
+                commStatus: f.commStatus,
+                turnoverStatus: f.turnoverStatus,
+                notes: f.notes || undefined,
+              })
+            }
+            className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
+          >
+            Update
           </button>
         </div>
       </div>

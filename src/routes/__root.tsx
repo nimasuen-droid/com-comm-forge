@@ -73,8 +73,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#0f1a2a" },
+      { name: "application-name", content: "CC Pro" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { name: "apple-mobile-web-app-title", content: "CC Pro" },
       { title: "Completions & Commissioning Pro" },
       {
@@ -115,7 +117,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/favicon.ico" },
+      { rel: "icon", type: "image/png", href: "/icon-192.png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -141,6 +144,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 import { useEffect } from "react";
 import { AppSidebar } from "@/components/AppSidebar";
 import { TopBar } from "@/components/TopBar";
+import { registerPWA } from "@/lib/pwa";
 import { useStore } from "@/lib/store";
 
 function RootComponent() {
@@ -153,6 +157,7 @@ function RootComponent() {
     if (!useStore.persist.hasHydrated()) {
       void useStore.persist.rehydrate();
     }
+    void registerPWA();
   }, []);
 
   return (
