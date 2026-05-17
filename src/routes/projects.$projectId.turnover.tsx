@@ -22,6 +22,7 @@ function TurnoverPage() {
   const project = useProject(projectId)!;
   const replaceSystems = useStore((s) => s.replaceSystems);
   const form = useDirtyForm(project.systems);
+  const draftProject = { ...project, systems: form.draft };
 
   const setCheck = (sysId: string, subId: string, key: TurnoverCheckKey, value: boolean) => {
     form.setDraft((systems) =>
@@ -101,7 +102,8 @@ function TurnoverPage() {
           <tbody className="divide-y divide-border">
             {form.draft.flatMap((sys) =>
               sys.subsystems.map((ss) => {
-                const { pct } = turnoverProgress(ss, project);
+                const { pct } = turnoverProgress(ss, draftProject);
+                const status = deriveTurnoverStatus(draftProject, sys, ss);
                 return (
                   <tr key={ss.id} className="hover:bg-muted/20">
                     <td className="px-4 py-3">
@@ -134,10 +136,10 @@ function TurnoverPage() {
                       <span
                         className={cn(
                           "inline-block px-2 py-0.5 rounded text-xs font-bold",
-                          ragColor[ss.turnoverStatus],
+                          ragColor[status],
                         )}
                       >
-                        {ss.turnoverStatus}
+                        {status}
                       </span>
                     </td>
                   </tr>

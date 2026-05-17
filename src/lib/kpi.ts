@@ -1,4 +1,5 @@
 import type { Project, RAG } from "./types";
+import { turnoverProgress } from "./derive";
 
 export const ragColor: Record<RAG, string> = {
   red: "bg-destructive text-destructive-foreground",
@@ -28,6 +29,8 @@ export function projectKpis(p: Project) {
   const total = subs.length || 1;
   const avg = (key: "mcStatus" | "rfsuStatus" | "commStatus" | "turnoverStatus") =>
     Math.round(subs.reduce((acc, s) => acc + ragScore[s[key]], 0) / total);
+  const avgProgress = (pctFor: (ss: (typeof subs)[number]) => number) =>
+    Math.round(subs.reduce((acc, ss) => acc + pctFor(ss), 0) / total);
   const punchOpen = p.punches.filter((x) => x.status !== "closed");
   return {
     systems: p.systems.length,
@@ -35,7 +38,7 @@ export function projectKpis(p: Project) {
     mcPct: avg("mcStatus"),
     rfsuPct: avg("rfsuStatus"),
     commPct: avg("commStatus"),
-    handoverPct: avg("turnoverStatus"),
+    handoverPct: avgProgress((ss) => turnoverProgress(ss, p).pct),
     punchTotal: p.punches.length,
     punchOpen: punchOpen.length,
     punchA: punchOpen.filter((x) => x.category === "A").length,
